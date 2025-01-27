@@ -1,18 +1,22 @@
 'use strict'
 /* eslint-env browser, webextensions */
 
-const debug = require('debug')
+import debug from 'debug'
+
+import isFQDN from 'is-fqdn'
+import isIPFS from 'is-ipfs'
+import LRU from 'lru-cache'
+import { recoveryPagePath } from './constants.js'
+import { braveNodeType } from './ipfs-client/brave.js'
+import { dropSlash, ipfsUri, pathAtHttpGateway, sameGateway } from './ipfs-path.js'
+import { safeURL } from './options.js'
+import { addRuleToDynamicRuleSetGenerator, isLocalHost, supportsDeclarativeNetRequest } from './redirect-handler/blockOrObserve.js'
+import { RequestTracker } from './trackers/requestTracker.js'
+
 const log = debug('ipfs-companion:request')
 log.error = debug('ipfs-companion:request:error')
 
-const LRU = require('lru-cache')
-const isIPFS = require('is-ipfs')
-const isFQDN = require('is-fqdn')
-const { pathAtHttpGateway, sameGateway, ipfsUri } = require('./ipfs-path')
-const { safeURL } = require('./options')
-const { braveNodeType } = require('./ipfs-client/brave')
-
-const redirectOptOutHint = 'x-ipfs-companion-no-redirect'
+export const redirectOptOutHint = 'x-ipfs-companion-no-redirect'
 const recoverableNetworkErrors = new Set([
   // Firefox
   'NS_ERROR_UNKNOWN_HOST', // dns failure
@@ -28,13 +32,17 @@ const recoverableHttpError = (code) => code && code >= 400
 
 // Tracking late redirects for edge cases such as https://github.com/ipfs-shipyard/ipfs-companion/issues/436
 const onHeadersReceivedRedirect = new Set()
+let addRuleToDynamicRuleSet = null
+const observedRequestTracker = new RequestTracker('url-observed')
+const resolvedRequestTracker = new RequestTracker('url-resolved')
 
 // Request modifier provides event listeners for the various stages of making an HTTP request
 // API Details: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/webRequest
-function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, runtime) {
+export function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, runtime) {
   const browser = runtime.browser
   const runtimeRoot = browser.runtime.getURL('/')
   const webExtensionOrigin = runtimeRoot ? new URL(runtimeRoot).origin : 'http://companion-origin' // avoid 'null' because it has special meaning
+  addRuleToDynamicRuleSet = addRuleToDynamicRuleSetGenerator(getState)
   const isCompanionRequest = (request) => {
     // We inspect webRequest object (WebExtension API) instead of Origin HTTP
     // header because the value of the latter changed over the years ad
@@ -54,38 +62,38 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
   }
 
   // Various types of requests are identified once and cached across all browser.webRequest hooks
-  const requestCacheCfg = { max: 128, maxAge: 1000 * 30 }
+  const requestCacheCfg = { max: 128, ttl: 1000 * 30 }
   const ignoredRequests = new LRU(requestCacheCfg)
   const ignore = (id) => ignoredRequests.set(id, true)
   const isIgnored = (id) => ignoredRequests.get(id) !== undefined
-  const errorInFlight = new LRU({ max: 3, maxAge: 1000 })
+  const errorInFlight = new LRU({ max: 3, ttl: 1000 })
 
   // Returns a canonical hostname representing the site from url
   // Main reason for this is unwrapping DNSLink from local subdomain
   // <fqdn>.ipns.localhost → <fqdn>
-  const findSiteFqdn = (url) => {
+  const findSiteFqdn = async (url) => {
     if (isIPFS.ipnsSubdomain(url)) {
       // convert subdomain's <fqdn>.ipns.gateway.tld to <fqdn>
-      const fqdn = dnslinkResolver.findDNSLinkHostname(url)
+      const fqdn = await dnslinkResolver.findDNSLinkHostname(url)
       if (fqdn) return fqdn
     }
     return new URL(url).hostname
   }
 
   // Finds canonical hostname of request.url and its parent page (if present)
-  const findSiteHostnames = (request) => {
+  const findSiteHostnames = async (request) => {
     const { url, originUrl, initiator } = request
-    const fqdn = findSiteFqdn(url)
+    const fqdn = await findSiteFqdn(url)
     // FF: originUrl (Referer-like Origin URL), Chrome: initiator (just Origin)
     const parentUrl = originUrl || initiator
     // String value 'null' is explicitly set by Chromium in some contexts
     const parentFqdn = parentUrl && parentUrl !== 'null' && url !== parentUrl
-      ? findSiteFqdn(parentUrl)
+      ? await findSiteFqdn(parentUrl)
       : null
     return { fqdn, parentFqdn }
   }
 
-  const preNormalizationSkip = (state, request) => {
+  const preNormalizationSkip = async (state, request) => {
     // skip requests to the custom gateway or API (otherwise we have too much recursion)
     if (sameGateway(request.url, state.gwURL) || sameGateway(request.url, state.apiURL)) {
       ignore(request.requestId)
@@ -95,12 +103,12 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
       ignore(request.requestId)
     }
     // skip all local requests
-    if (request.url.startsWith('http://127.0.0.1') || request.url.startsWith('http://localhost') || request.url.startsWith('http://[::1]')) {
+    if (isLocalHost(request.url)) {
       ignore(request.requestId)
     }
 
     // skip if a per-site opt-out exists
-    const { fqdn, parentFqdn } = findSiteHostnames(request)
+    const { fqdn, parentFqdn } = await findSiteHostnames(request)
     const triggerOptOut = (optout) => {
       // Disable optout on canonical public gateway
       if (fqdn === 'gateway.ipfs.io') return false
@@ -136,30 +144,51 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
     // browser.webRequest.onBeforeRequest
     // This event is triggered when a request is about to be made, and before headers are available.
     // This is a good place to listen if you want to cancel or redirect the request.
-    onBeforeRequest (request) {
+    async onBeforeRequest (request) {
       const state = getState()
       if (!state.active) return
+      observedRequestTracker.track(request)
+
+      // When local IPFS node is unreachable , show recovery page where user can redirect
+      // to public gateway.
+      if (!state.nodeActive && request.type === 'main_frame' && sameGateway(request.url, state.gwURL)) {
+        const publicUri = await ipfsPathValidator.resolveToPublicUrl(request.url, state.pubGwURLString)
+        return handleRedirection({
+          originUrl: request.url,
+          redirectUrl: `${dropSlash(runtimeRoot)}${recoveryPagePath}#${encodeURIComponent(publicUri)}`,
+          request
+        })
+      }
 
       // When Subdomain Proxy is enabled we normalize address bar requests made
       // to the local gateway and replace raw IP with 'localhost' hostname to
       // take advantage of subdomain redirect provided by go-ipfs >= 0.5
       if (state.redirect && request.type === 'main_frame' && sameGateway(request.url, state.gwURL)) {
         const redirectUrl = safeURL(request.url, { useLocalhostName: state.useSubdomains }).toString()
-        if (redirectUrl !== request.url) return { redirectUrl }
+        return handleRedirection({
+          originUrl: request.url,
+          redirectUrl,
+          request
+        })
       }
+
       // For now normalize API to the IP to comply with go-ipfs checks
       if (state.redirect && request.type === 'main_frame' && sameGateway(request.url, state.apiURL)) {
         const redirectUrl = safeURL(request.url, { useLocalhostName: false }).toString()
-        if (redirectUrl !== request.url) return { redirectUrl }
+        return handleRedirection({
+          originUrl: request.url,
+          redirectUrl,
+          request
+        })
       }
 
       // early sanity checks
-      if (preNormalizationSkip(state, request)) {
+      if (await preNormalizationSkip(state, request)) {
         return
       }
       // poor-mans protocol handlers - https://github.com/ipfs/ipfs-companion/issues/164#issuecomment-328374052
       if (state.catchUnhandledProtocols && mayContainUnhandledIpfsProtocol(request)) {
-        const fix = normalizedUnhandledIpfsProtocol(request, state.pubGwURLString)
+        const fix = await normalizedUnhandledIpfsProtocol(request, state.pubGwURLString)
         if (fix) {
           return fix
         }
@@ -179,13 +208,13 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
           return
         }
         // Detect valid /ipfs/ and /ipns/ on any site
-        if (ipfsPathValidator.publicIpfsOrIpnsResource(request.url) && isSafeToRedirect(request, runtime)) {
+        if (await ipfsPathValidator.publicIpfsOrIpnsResource(request.url) && isSafeToRedirect(request, runtime)) {
           return redirectToGateway(request, request.url, state, ipfsPathValidator, runtime)
         }
         // Detect dnslink using heuristics enabled in Preferences
         if (state.dnslinkPolicy && dnslinkResolver.canLookupURL(request.url)) {
           if (state.dnslinkRedirect) {
-            const dnslinkAtGw = dnslinkResolver.dnslinkAtGateway(request.url)
+            const dnslinkAtGw = await dnslinkResolver.dnslinkAtGateway(request.url)
             if (dnslinkAtGw && isSafeToRedirect(request, runtime)) {
               return redirectToGateway(request, dnslinkAtGw, state, ipfsPathValidator, runtime)
             }
@@ -211,10 +240,10 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
         const { requestHeaders } = request
 
         if (isCompanionRequest(request)) {
-          // '403 - Forbidden' fix for Chrome and Firefox
+          // '403 - Forbidden' fix for browsers that support blocking webRequest API (e.g. Firefox)
           // --------------------------------------------
           // We update "Origin: *-extension://" HTTP headers in requests made to API
-          // by js-ipfs-http-client running in the background page of browser
+          // by js-kubo-rpc-client running in the background page of browser
           // extension.  Without this, some users would need to do manual CORS
           // whitelisting by adding "..extension://<UUID>" to
           // API.HTTPHeaders.Access-Control-Allow-Origin in go-ipfs config.
@@ -284,7 +313,7 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
     // browser.webRequest.onHeadersReceived
     // Fired when the HTTP response headers associated with a request have been received.
     // You can use this event to modify HTTP response headers or do a very late redirect.
-    onHeadersReceived (request) {
+    async onHeadersReceived (request) {
       const state = getState()
       if (!state.active) return
 
@@ -299,7 +328,7 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
         if (runtime.requiresXHRCORSfix && onHeadersReceivedRedirect.has(request.requestId)) {
           onHeadersReceivedRedirect.delete(request.requestId)
           if (state.dnslinkPolicy) {
-            const dnslinkAtGw = dnslinkResolver.dnslinkAtGateway(request.url)
+            const dnslinkAtGw = await dnslinkResolver.dnslinkAtGateway(request.url)
             if (dnslinkAtGw) {
               return redirectToGateway(request, dnslinkAtGw, state, ipfsPathValidator, runtime)
             }
@@ -325,8 +354,8 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
                 // so we force dnslink lookup to pre-populate dnslink cache
                 // in a way that works even when state.dnslinkPolicy !== 'enabled'
                 // All the following requests will be upgraded to IPNS
-                const cachedDnslink = dnslinkResolver.readAndCacheDnslink(new URL(request.url).hostname)
-                const dnslinkAtGw = dnslinkResolver.dnslinkAtGateway(request.url, cachedDnslink)
+                const cachedDnslink = await dnslinkResolver.readAndCacheDnslink(new URL(request.url).hostname)
+                const dnslinkAtGw = await dnslinkResolver.dnslinkAtGateway(request.url, cachedDnslink)
                 // redirect only if local node is around, as we can't guarantee DNSLink support
                 // at a public subdomain gateway (requires more than 1 level of wildcard TLS certs)
                 if (dnslinkAtGw && state.localGwAvailable) {
@@ -365,7 +394,7 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
     // Fired when a request could not be processed due to an error on network level.
     // For example: TCP timeout, DNS lookup failure
     // NOTE: this is executed only if webRequest.ResourceType='main_frame'
-    onErrorOccurred (request) {
+    async onErrorOccurred (request) {
       const state = getState()
       if (!state.active) return
 
@@ -394,9 +423,9 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
       // Check if error can be recovered via DNSLink
       if (isRecoverableViaDNSLink(request, state, dnslinkResolver)) {
         const { hostname } = new URL(request.url)
-        const dnslink = dnslinkResolver.readAndCacheDnslink(hostname)
+        const dnslink = await dnslinkResolver.readAndCacheDnslink(hostname)
         if (dnslink) {
-          const redirectUrl = dnslinkResolver.dnslinkAtGateway(request.url, dnslink)
+          const redirectUrl = await dnslinkResolver.dnslinkAtGateway(request.url, dnslink)
           log(`onErrorOccurred: attempting to recover from network error (${request.error}) using dnslink for ${request.url} → ${redirectUrl}`, request)
           // We are unable to redirect in onErrorOccurred, but we can update the tab
           return updateTabWithURL(request, redirectUrl, browser)
@@ -410,8 +439,8 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
 
       // Check if error can be recovered by opening same content-addresed path
       // using active gateway (public or local, depending on redirect state)
-      if (isRecoverable(request, state, ipfsPathValidator)) {
-        const redirectUrl = ipfsPathValidator.resolveToPublicUrl(request.url)
+      if (await isRecoverable(request, state, ipfsPathValidator)) {
+        const redirectUrl = await ipfsPathValidator.resolveToPublicUrl(request.url)
         log(`onErrorOccurred: attempting to recover from network error (${request.error}) for ${request.url} → ${redirectUrl}`, request)
         // We are unable to redirect in onErrorOccurred, but we can update the tab
         return updateTabWithURL(request, redirectUrl, browser)
@@ -421,7 +450,7 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
     // browser.webRequest.onCompleted
     // Fired when HTTP request is completed (successfully or with an error code)
     // NOTE: this is executed only if webRequest.ResourceType='main_frame'
-    onCompleted (request) {
+    async onCompleted (request) {
       const state = getState()
       if (!state.active) return
       if (request.statusCode === 200) return // finish if no error to recover from
@@ -441,8 +470,8 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
         return browser.tabs.update(request.tabId, { url: fixedUrl })
       }
 
-      if (isRecoverable(request, state, ipfsPathValidator)) {
-        const redirectUrl = ipfsPathValidator.resolveToPublicUrl(request.url)
+      if (await isRecoverable(request, state, ipfsPathValidator)) {
+        const redirectUrl = await ipfsPathValidator.resolveToPublicUrl(request.url)
         log(`onCompleted: attempting to recover from HTTP Error ${request.statusCode} for ${request.url} → ${redirectUrl}`, request)
         return updateTabWithURL(request, redirectUrl, browser)
       }
@@ -450,13 +479,28 @@ function createRequestModifier (getState, dnslinkResolver, ipfsPathValidator, ru
   }
 }
 
-exports.redirectOptOutHint = redirectOptOutHint
-exports.createRequestModifier = createRequestModifier
+/**
+ * Handles redirection in MV2 and MV3.
+ *
+ * @param {object} input contains originUrl and redirectUrl.
+ * @returns
+ */
+async function handleRedirection ({ originUrl, redirectUrl, request }) {
+  if (redirectUrl !== '' && originUrl !== '' && redirectUrl !== originUrl) {
+    resolvedRequestTracker.track(request)
+    if (!supportsDeclarativeNetRequest()) {
+      return { redirectUrl }
+    }
+
+    // Let browser handle redirection MV3 style.
+    await addRuleToDynamicRuleSet({ originUrl, redirectUrl })
+  }
+}
 
 // Returns a string with URL at the active gateway (local or public)
-function redirectToGateway (request, url, state, ipfsPathValidator, runtime) {
+async function redirectToGateway (request, url, state, ipfsPathValidator, runtime) {
   const { resolveToPublicUrl, resolveToLocalUrl } = ipfsPathValidator
-  let redirectUrl = state.localGwAvailable ? resolveToLocalUrl(url) : resolveToPublicUrl(url)
+  let redirectUrl = await (state.localGwAvailable ? resolveToLocalUrl(url) : resolveToPublicUrl(url))
 
   // SUBRESOURCE ON HTTPS PAGE: THE WORKAROUND EXTRAVAGANZA
   // ------------------------------------------------------ \o/
@@ -478,7 +522,7 @@ function redirectToGateway (request, url, state, ipfsPathValidator, runtime) {
   //
   if (state.localGwAvailable) {
     const { type, originUrl, initiator } = request
-    // match request types for embedded subdresources, but skip ones coming from local gateway
+    // match request types for embedded subresources, but skip ones coming from local gateway
     const parentUrl = originUrl || initiator // FF || Chromium
     if (type !== 'main_frame' && (parentUrl && !sameGateway(parentUrl, state.gwURL))) {
       // use raw IP to ensure subresource will be loaded from the path gateway
@@ -500,8 +544,11 @@ function redirectToGateway (request, url, state, ipfsPathValidator, runtime) {
     }
   }
 
-  // return a redirect only if URL changed
-  if (redirectUrl && request.url !== redirectUrl) return { redirectUrl }
+  return handleRedirection({
+    originUrl: request.url,
+    redirectUrl,
+    request
+  })
 }
 
 function isSafeToRedirect (request, runtime) {
@@ -568,7 +615,11 @@ function normalizedRedirectingProtocolRequest (request, pubGwUrl) {
   // additional fixups of the final path
   path = fixupDnslinkPath(path) // /ipfs/example.com → /ipns/example.com
   if (oldPath !== path && isIPFS.path(path)) {
-    return { redirectUrl: pathAtHttpGateway(path, pubGwUrl) }
+    return handleRedirection({
+      originUrl: request.url,
+      redirectUrl: pathAtHttpGateway(path, pubGwUrl),
+      request
+    })
   }
   return null
 }
@@ -610,7 +661,12 @@ function normalizedUnhandledIpfsProtocol (request, pubGwUrl) {
   if (isIPFS.path(path)) {
     // replace search query with a request to a public gateway
     // (will be redirected later, if needed)
-    return { redirectUrl: pathAtHttpGateway(path, pubGwUrl) }
+    return handleRedirection({
+      originUrl: request.url,
+      redirectUrl: pathAtHttpGateway(path, pubGwUrl),
+      request
+
+    })
   }
 }
 
@@ -618,7 +674,7 @@ function normalizedUnhandledIpfsProtocol (request, pubGwUrl) {
 // ===================================================================
 
 // Recovery check for onErrorOccurred (request.error) and onCompleted (request.statusCode)
-function isRecoverable (request, state, ipfsPathValidator) {
+async function isRecoverable (request, state, ipfsPathValidator) {
   // Note: we are unable to recover default public gateways without a local one
   const { error, statusCode, url } = request
   const { redirect, localGwAvailable, pubGwURL, pubSubdomainGwURL } = state
@@ -626,7 +682,7 @@ function isRecoverable (request, state, ipfsPathValidator) {
     request.type === 'main_frame' &&
     (recoverableNetworkErrors.has(error) ||
       recoverableHttpError(statusCode)) &&
-    ipfsPathValidator.publicIpfsOrIpnsResource(url) &&
+    await ipfsPathValidator.publicIpfsOrIpnsResource(url) &&
     ((redirect && localGwAvailable) ||
       (!sameGateway(url, pubGwURL) &&
        !sameGateway(url, pubSubdomainGwURL))))

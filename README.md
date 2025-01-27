@@ -1,22 +1,27 @@
-# IPFS Companion
-**Harness the power of [IPFS](https://ipfs.io/) in your browser!**
+<h1 align="center">IPFS Companion Browser Extension</h1>
 
-[![](https://img.shields.io/github/release/ipfs/ipfs-companion.svg)](https://github.com/ipfs/ipfs-companion/releases/latest)
-[![](https://img.shields.io/badge/mozilla-reviewed-blue.svg)](https://addons.mozilla.org/en-US/firefox/addon/ipfs-companion/)
-[![i18n status](https://img.shields.io/badge/i18n-translated-blue.svg)](https://github.com/ipfs-shipyard/ipfs-companion/blob/main/LOCALIZATION-NOTES.md)
-[![](https://img.shields.io/badge/matrix%20chat-%23lobby:ipfs.io-blue.svg?style=flat-square)](https://matrix.to/#/#lobby:ipfs.io)
+<p align="center" style="font-size: 1.2rem;">Harness the power of <a href="https://ipfs.tech">IPFS</a> in your browser!</p>
 
-![Quick runthrough of basic IPFS Companion features](https://gateway.ipfs.io/ipfs/QmSsGphTN1eWMhkFFNFb23jWTXyhNbo47PF9FbmC6ZaRNg)
+<p align="center">
+  <a href="https://ipfs.tech"><img src="https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square" alt="Official Part of IPFS Project"></a>
+  <a href="https://discuss.ipfs.tech"><img alt="Discourse Forum" src="https://img.shields.io/discourse/posts?server=https%3A%2F%2Fdiscuss.ipfs.tech&amp;color=blue"></a>
+  <a href="https://matrix.to/#/#ipfs-space:ipfs.io"><img alt="Matrix Chat" src="https://img.shields.io/matrix/ipfs-space%3Aipfs.io?server_fqdn=matrix.org&amp;color=blue"></a>
+  <a href="https://github.com/ipfs/ipfs-companion/releases"><img alt="GitHub release" src="https://img.shields.io/github/v/release/ipfs/ipfs-companion?filter=!*rc*"></a>
+  <a href="https://github.com/ipfs-shipyard/ipfs-companion/blob/main/docs/LOCALIZATION-NOTES.md"><img src="https://img.shields.io/badge/i18n-translated-blue.svg" alt="i18n status"></a>
+  <a href="https://github.com/ipfs/ipfs-companion/actions"><img src="https://img.shields.io/github/actions/workflow/status/ipfs/ipfs-companion/ci.yml?branch=main" alt="ci"></a>
+</p>
 
+<a href="https://docs.ipfs.tech/install/ipfs-companion/"><img src="https://gateway.ipfs.io/ipfs/QmSsGphTN1eWMhkFFNFb23jWTXyhNbo47PF9FbmC6ZaRNg" alt="Companion UX demo" title="Companion UX demo" width="100%"></a>
 
-
+<div align="center">
+  
 | <img src="https://unpkg.com/@browser-logos/firefox/firefox_16x16.png" width="16" height="16"> [Firefox](https://www.mozilla.org/firefox/new/) \| [Firefox for Android](https://play.google.com/store/apps/details?id=org.mozilla.firefox) | <img src="https://unpkg.com/@browser-logos/chrome/chrome_16x16.png" width="16" height="16"> [Chrome](https://www.google.com/chrome/) \| <img src="https://unpkg.com/@browser-logos/brave/brave_16x16.png" width="16" height="16"> [Brave](https://brave.com/) \| <img src="https://unpkg.com/@browser-logos/opera/opera_16x16.png" width="16" height="16"> [Opera](https://www.opera.com/)  \| <img src="https://unpkg.com/@browser-logos/edge/edge_16x16.png" width="16" height="16"> [Edge](https://www.microsoftedgeinsider.com/)
 |------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [![Install From AMO](https://ipfs.io/ipfs/QmWNa64XjA78QvK3zG2593bSMizkDXXcubDHjnRDYUivqt)<br>![](https://img.shields.io/amo/users/ipfs-companion?label=AMO%20users&style=social)](https://addons.mozilla.org/firefox/addon/ipfs-companion/) | [![Install from Chrome Store](https://ipfs.io/ipfs/QmU4Qm5YEKy5yHmdAgU2fD7PjZLgrYTUUbxTydqG2QK3TT)<br>![](https://img.shields.io/chrome-web-store/users/nibjojkomfdiaoajekhjakgkdhaomnch?label=Chrome%20Web%20Store%20users&style=social)](https://chrome.google.com/webstore/detail/ipfs-companion/nibjojkomfdiaoajekhjakgkdhaomnch) |
 
-## Lead maintainer
+</div>
 
-[Marcin Rataj](https://github.com/lidel)
+<hr />
 
 ## Table of contents
 
@@ -29,7 +34,7 @@
 
 ## About IPFS Companion
 
-IPFS Companion harnesses the power of your locally running IPFS node (either through the [IPFS Desktop](https://github.com/ipfs-shipyard/ipfs-desktop/#ipfs-desktop) app or the command-line daemon) directly inside your favorite Chromium-based or Firefox browser, enabling support for `ipfs://` addresses, automatic IPFS gateway loading of websites and file paths, easy IPFS file import and sharing, and more.
+IPFS Companion harnesses the power of your locally running IPFS node (either through the [IPFS Desktop](https://docs.ipfs.io/install/ipfs-desktop/) app or the [command-line daemon](https://docs.ipfs.io/install/command-line/)) directly inside your favorite Chromium-based or Firefox browser, enabling support for [`ipfs://` addresses](https://docs.ipfs.io/how-to/address-ipfs-on-web/#native-urls), redirecting content-addressed  websites and file paths to your local [Gateway](https://docs.ipfs.io/concepts/glossary/#gateway), easy IPFS file import and sharing, and more.
 
 IPFS is a peer-to-peer hypermedia protocol designed to make the web faster, safer, more resilient, and more open. It enables the creation and dissemination of completely distributed sites and applications that don’t rely on centralized hosting and stay true to the original vision of an open, flat web. Visit [the IPFS Project website](https://ipfs.io) to learn more.
 
@@ -40,7 +45,7 @@ IPFS is a peer-to-peer hypermedia protocol designed to make the web faster, safe
 #### Detect URLs with IPFS paths
 
 IPFS Companion detects and tests requests for IPFS-like paths ( such as `/ipfs/{cid}` or `/ipns/{peerid_or_host-with-dnslink}`) on any website. If a path is a [valid IPFS address](https://github.com/ipfs/is-ipfs), it is redirected to load from your local gateway. The gateway at `localhost` will also automatically switch to a subdomain to provide a unique origin for each website:
-> `https://ipfs.io/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`  
+> `https://ipfs.io/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`
 > → `http://localhost:8080/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR`
 > → `http://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.localhost:8080`
 
@@ -48,8 +53,8 @@ IPFS Companion detects and tests requests for IPFS-like paths ( such as `/ipfs/{
 
 IPFS Companion [detects DNSLink info](http://docs.ipfs.io/how-to/dnslink-companion/) in the DNS records of websites. If a site uses DNSLink (a few examples are https://docs.ipfs.io, https://ipld.io, and http://tr.wikipedia-on-ipfs.org), IPFS Companion redirects the HTTP request to your local gateway:
 
-> `http://docs.ipfs.io`  
-> → `http://localhost:8080/ipns/docs.ipfs.io` → `http://docs.ipfs.io.ipns.localhost:8080/`
+> `http://docs.ipfs.tech`
+> → `http://localhost:8080/ipns/docs.ipfs.tech` → `http://docs.ipfs.tech.ipns.localhost:8080/`
 
 #### Detect pages with `x-ipfs-path` headers
 
@@ -62,15 +67,6 @@ You can disable and re-enable local gateway redirects by several means:
 - Suspend redirects **globally** in IPFS Companion's preferences
 - Suspend redirects **per site** using the toggle under "Current tab" ([illustrated below](#toggle-gateway-redirects-on-a-per-website-basis)) or in IPFS Companion's preferences
 - Add `x-ipfs-companion-no-redirect` to the URL itself as a hash ([example](https://ipfs.io/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR#x-ipfs-companion-no-redirect)) or query parameter ([example](https://ipfs.io/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?x-ipfs-companion-no-redirect))
-
-<!-- TODO: restore after https://github.com/ipfs-shipyard/ipfs-companion/issues/843 is closed
-### IPFS API as `window.ipfs`
-
-Your IPFS node is exposed as `window.ipfs` on every web page.
-Websites can detect if `window.ipfs` exists and opt-in to use it instead of creating their own `js-ipfs` node.
-It saves system resources and battery (on mobile), avoids the overhead of peer discovery/connection, enables shared repository access and more!
-Make sure to read our [notes on `window.ipfs`](https://github.com/ipfs-shipyard/ipfs-companion/blob/main/docs/window.ipfs.md), where we explain it in-depth and provide examples on how to use it your own dapp.
--->
 
 ### Access frequently-used IPFS actions from your browser bar
 
@@ -105,11 +101,6 @@ IPFS Companion ships with a variety of experimental features. Some are disabled 
 - Re-route requests made via the following [experimental protocols](https://github.com/ipfs/ipfs-companion/issues/164) to an HTTP gateway (public or custom):
     - `ipfs://$cid`
     - `ipns://$cid_or_fqdn`
-    - `dweb:/ipfs/$cid`
-    - `dweb:/ipns/$cid_or_fqdn`
-
-- Switch between the external HTTP API of your local IPFS node (default setting) and a js-ipfs node embedded in your browser (note that this has some [functionality limitations](https://docs.ipfs.io/how-to/companion-node-types/))
-[![screenshot of node type switch](https://gateway.ipfs.io/ipfs/QmPDxawBTEmH5Dk1anaqpryRyyaNwmqVPt5DsCf21eFWQz)](http://docs.ipfs.io/how-to/companion-node-types/)
 
 ## Install IPFS Companion
 
@@ -126,7 +117,7 @@ but these builds are not signed, nor will automatically update. `.zip` bundles a
 
 ### Development
 
-To work on IPFS Companion's code, you'll need to install it from source. Quick steps are below, but see the full [developer notes](DEVELOPER-NOTES.md) for more detailed instructions and tips.
+To work on IPFS Companion's code, you'll need to install it from source. Quick steps are below, but see the full [developer notes](./docs/DEVELOPER-NOTES.md) for more detailed instructions and tips.
 
 1. Clone https://github.com/ipfs-shipyard/ipfs-companion.git
 2. Run this all-in-one dev build to install dependencies, build, and launch in the browser of your choice:
@@ -141,12 +132,16 @@ To work on IPFS Companion's code, you'll need to install it from source. Quick s
 
 ## Contribute
 
-[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](CONTRIBUTING.md)
+[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](./docs/CONTRIBUTING.md)
 
 All are welcome to help make IPFS Companion even better!
-- Check out the [contribution guide](CONTRIBUTING.md) for how to get started as a developer
+- Check out the [contribution guide](./docs/CONTRIBUTING.md) for how to get started as a developer
 - Open an [issue](https://github.com/ipfs/ipfs-companion/issues)
 - Make sure you read and abide by the [IPFS Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md)
+
+## Release Process
+
+The release process has been [documented here](./docs/RELEASE-PROCESS.md).
 
 ## Help & troubleshooting
 
@@ -171,7 +166,7 @@ Deny
 
 ## Privacy & license info
 
-- IPFS Companion [Privacy policy](PRIVACY-POLICY.md)
+- IPFS Companion [Privacy policy](./PRIVACY-POLICY.md)
 - The IPFS logo belongs to the [IPFS Project](https://github.com/ipfs) and is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/legalcode">CC-BY-SA 3.0</a> license
 - [is-ipfs](https://github.com/ipfs-shipyard/is-ipfs), [js-multihash](https://github.com/multiformats/js-multihash), and other npm dependencies are under MIT license, unless stated otherwise
 - IPFS Companion itself is released under [CC0](LICENSE); to the extent possible under law, the author has waived all copyright and related or neighboring rights to this work, effectively placing it in the public domain

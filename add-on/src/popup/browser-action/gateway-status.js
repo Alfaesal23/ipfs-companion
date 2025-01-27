@@ -1,8 +1,8 @@
 'use strict'
 /* eslint-env browser, webextensions */
 
-const browser = require('webextension-polyfill')
-const html = require('choo/html')
+import browser from 'webextension-polyfill'
+import html from 'choo/html/index.js'
 
 function statusEntry ({ label, labelLegend, value, check, itemClass = '', valueClass = '' }) {
   const offline = browser.i18n.getMessage('panel_statusOffline')
@@ -17,14 +17,13 @@ function statusEntry ({ label, labelLegend, value, check, itemClass = '', valueC
     `
 }
 
-module.exports = function gatewayStatus ({
-  ipfsApiUrl,
+export default function gatewayStatus ({
   gatewayAddress,
-  gatewayVersion,
-  swarmPeers,
-  ipfsNodeType
+  kuboRpcBackendVersion,
+  ipfsApiUrl,
+  swarmPeers
 }) {
-  const api = ipfsApiUrl && ipfsNodeType === 'embedded' ? 'js-ipfs' : ipfsApiUrl
+  const api = ipfsApiUrl
   return html`
     <ul class="fade-in list mv0 pt2 ph3 white">
     ${statusEntry({
@@ -43,7 +42,7 @@ module.exports = function gatewayStatus ({
       label: 'panel_statusApiAddress',
       labelLegend: 'panel_statusApiAddressTitle',
       value: api,
-      check: gatewayVersion
+      check: kuboRpcBackendVersion
     })}
     </ul>
   `

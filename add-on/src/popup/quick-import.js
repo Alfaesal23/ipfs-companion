@@ -1,17 +1,19 @@
 'use strict'
 /* eslint-env browser, webextensions */
 
-require('./quick-import.css')
+import './quick-import.css'
 
-const browser = require('webextension-polyfill')
-const choo = require('choo')
-const html = require('choo/html')
-const logo = require('./logo')
-const externalApiClient = require('../lib/ipfs-client/external')
-const { formatImportDirectory } = require('../lib/ipfs-import')
-const all = require('it-all')
-const drop = require('drag-and-drop-files')
-const filesize = require('filesize')
+import choo from 'choo'
+import html from 'choo/html/index.js'
+import drop from 'drag-and-drop-files'
+import { filesize } from 'filesize'
+import all from 'it-all'
+import browser from 'webextension-polyfill'
+import * as externalApiClient from '../lib/ipfs-client/external.js'
+import createIpfsCompanion from '../lib/ipfs-companion.js'
+import { formatImportDirectory } from '../lib/ipfs-import.js'
+import logo from './logo.js'
+import { POSSIBLE_NODE_TYPES } from '../lib/state.js'
 
 document.title = browser.i18n.getMessage('quickImport_page_title')
 
@@ -48,6 +50,7 @@ function quickImportStore (state, emitter) {
   let port
 
   emitter.on('DOMContentLoaded', async () => {
+    browser.runtime.sendMessage({ telemetry: { trackView: 'quick-import' } })
     // initialize connection to the background script which will trigger UI updates
     port = browser.runtime.connect({ name: 'browser-action-port' })
     port.onMessage.addListener(async (message) => {
@@ -61,13 +64,18 @@ function quickImportStore (state, emitter) {
 
   emitter.on('fileInputChange', event => processFiles(state, emitter, event.target.files))
 
+  // update companion preference
+  emitter.on('optionChange', ({ key, value }) => {
+    browser.storage.local.set({ [key]: value })
+  })
+
   // drag & drop anywhere
   drop(document.body, files => processFiles(state, emitter, files))
 }
 
 async function processFiles (state, emitter, files) {
   console.log('Processing files', files)
-  const { ipfsCompanion } = await browser.runtime.getBackgroundPage()
+  const ipfsCompanion = await createIpfsCompanion(true)
   try {
     console.log('importing files', files)
     if (!files.length) {
@@ -113,7 +121,7 @@ async function processFiles (state, emitter, files) {
 
     let ipfs
     if (httpStreaming) {
-      // We create separate instance of http client running in thie same page to
+      // We create separate instance of http client running in the same page to
       // avoid serialization issues in Chromium
       // (https://bugs.chromium.org/p/chromium/issues/detail?id=112163) when
       // crossing process boundary, which enables streaming upload of big files
@@ -138,8 +146,12 @@ async function processFiles (state, emitter, files) {
     copyShareLink(results)
     preloadFilesAtPublicGateway(results)
 
-    // present result to the user using the beast available way
-    if (!state.openViaWebUI || state.ipfsNodeType.startsWith('embedded')) {
+    // update preferred import dir if user specified one while importing
+    if (state.userChangedImportDir) {
+      emitter.emit('optionChange', { key: 'importDir', value: state.importDir })
+    }
+    // present result to the user using the best available way
+    if (!state.openViaWebUI) {
       await openFilesAtGateway(importDir)
     } else {
       await openFilesAtWebUI(importDir)
@@ -161,7 +173,7 @@ function quickImportOptions (state, emit) {
   const onExpandOptions = (e) => { state.expandOptions = true; emit('render') }
   const onDirectoryChange = (e) => { state.userChangedImportDir = true; state.importDir = e.target.value }
   const onOpenViaWebUIChange = (e) => { state.userChangedOpenViaWebUI = true; state.openViaWebUI = e.target.checked }
-  const displayOpenWebUI = state.ipfsNodeType !== 'embedded'
+  const displayOpenWebUI = POSSIBLE_NODE_TYPES.includes(state.ipfsNodeType)
 
   if (state.expandOptions) {
     return html`

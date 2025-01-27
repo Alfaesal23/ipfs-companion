@@ -13,7 +13,7 @@
   },
   "panel_headerActiveToggleTitle": {
     "message": "Toggle all IPFS integrations",
-    "description": "A label for an embedded IPFS node (panel_headerActiveToggleTitle)"
+    "description": "A label for toggling all IPFS integrations (panel_headerActiveToggleTitle)"
   },
   "panel_statusOffline": {
     "message": "offline",
@@ -28,20 +28,16 @@
     "description": "A label in Node status section of Browser Action pop-up (panel_statusGatewayAddressTitle)"
   },
   "panel_statusApiAddress": {
-    "message": "API",
+    "message": "RPC",
     "description": "A label in Node status section of Browser Action pop-up (panel_statusApiAddress)"
   },
   "panel_statusApiAddressTitle": {
-    "message": "The URL of your local node's API",
+    "message": "The URL of your local Kubo RPC",
     "description": "A label in Node status section of Browser Action pop-up (panel_statusApiAddressTitle)"
   },
-  "panel_statusGatewayVersion": {
-    "message": "version",
-    "description": "A label in Node status section of Browser Action pop-up (panel_statusGatewayVersion)"
-  },
-  "panel_statusGatewayVersionTitle": {
-    "message": "The version of IPFS your local node is using",
-    "description": "A label in Node status section of Browser Action pop-up (panel_statusGatewayVersionTitle)"
+  "panel_kuboRpcBackendVersionTitle": {
+    "message": "The version of IPFS backend this extension talks to over Kubo RPC API",
+    "description": "A label in Node status section of Browser Action pop-up (panel_kuboRpcBackendVersionTitle)"
   },
   "panel_statusSwarmPeers": {
     "message": "Peers",
@@ -92,8 +88,8 @@
     "description": "A menu item tooltip in Browser Action pop-up (panel_importCurrentIpfsAddressTooltip)"
   },
   "panelCopy_currentIpnsAddress": {
-  "message": "Copy IPNS Path",
-  "description": "A menu item in Browser Action pop-up and right-click context menu (panelCopy_currentIpnsAddress)"
+    "message": "Copy IPNS Path",
+    "description": "A menu item in Browser Action pop-up and right-click context menu (panelCopy_currentIpnsAddress)"
   },
   "panelCopy_currentIpnsAddressTooltip": {
     "message": "Use this content path with IPFS tools and gateways to reach the most recently updated version of this tab's content.",
@@ -199,24 +195,8 @@
     "message": "Error while importing IPFS Resource",
     "description": "A title of system notification (notify_fileCpImportErrorTitle)"
   },
-  "notify_apiOnlineTitle": {
-    "message": "IPFS API is Online",
-    "description": "A title of system notification (notify_apiOnlineTitle)"
-  },
-  "notify_apiOnlineAutomaticModeMsg": {
-    "message": "Automatic Mode: Custom gateway redirect is active",
-    "description": "A message in system notification (notify_apiOnlineAutomaticModeMsg)"
-  },
-  "notify_apiOfflineTitle": {
-    "message": "IPFS API is Offline",
-    "description": "A title of system notification (notify_apiOfflineTitle)"
-  },
-  "notify_apiOfflineAutomaticModeMsg": {
-    "message": "Automatic Mode: Public gateway will be used as a fallback",
-    "description": "A message in system notification (notify_apiOfflineAutomaticModeMsg)"
-  },
   "notify_importErrorTitle": {
-    "message": "Unable to Import via IPFS API",
+    "message": "Unable to Import via Kubo RPC",
     "description": "A title of system notification (notify_importErrorTitle)"
   },
   "notify_importTrackingProtectionErrorMsg": {
@@ -239,19 +219,19 @@
     "message": "Failed to Stop IPFS Node",
     "description": "System notification title displayed when stopping an IPFS node fails (notify_stopIpfsNodeErrorTitle)"
   },
-  "option_page_title" : {
+  "option_page_title": {
     "message": "Preferences | IPFS Companion",
     "description": "Title of the Preferences page (option_page_title)"
   },
-  "option_page_header" : {
+  "option_page_header": {
     "message": "Companion Preferences",
     "description": "Main header on the Preferences screen (option_page_header)"
   },
-  "option_legend_readMore" : {
+  "option_legend_readMore": {
     "message": "Read more",
     "description": "A generic link in option description on the Preferences screen (option_legend_readMore)"
   },
-  "option_header_nodeType" : {
+  "option_header_nodeType": {
     "message": "IPFS Node",
     "description": "A section header on the Preferences screen (option_header_nodeType)"
   },
@@ -264,12 +244,8 @@
     "description": "An option title on the Preferences screen (option_ipfsNodeType_title)"
   },
   "option_ipfsNodeType_external_description": {
-    "message": "Set to \"External\" to connect to a local node using the HTTP API.",
+    "message": "Set to \"External\" to connect to a local Kubo node using the Kubo RPC API.",
     "description": "An option description on the Preferences screen (option_ipfsNodeType_external_description)"
-  },
-  "option_ipfsNodeType_embedded_description": {
-    "message": "Set to \"Embedded\" to run a js-ipfs node directly in your browser. (Click \"Read more\" to learn about the limitations of this experimental feature.)",
-    "description": "An option description on the Preferences screen (option_ipfsNodeType_embedded_description)"
   },
   "option_ipfsNodeType_brave_description": {
     "message": "Set to \"Provided by Brave\" to leverage the Brave browser's native IPFS support.",
@@ -279,17 +255,9 @@
     "message": "IPFS Node Config",
     "description": "An option title on the Preferences screen (option_ipfsNodeConfig_title)"
   },
-  "option_ipfsNodeConfig_description": {
-    "message": "Additional configuration for the embedded JS IPFS node. Must be valid JSON.",
-    "description": "An option description on the Preferences screen (option_ipfsNodeConfig_description)"
-  },
   "option_ipfsNodeType_external": {
-    "message": "External",
+    "message": "External (Kubo RPC)",
     "description": "An option on the Preferences screen (option_ipfsNodeType_external)"
-  },
-  "option_ipfsNodeType_embedded": {
-    "message": "Embedded",
-    "description": "An option on the Preferences screen (option_ipfsNodeType_embedded)"
   },
   "option_ipfsNodeType_brave": {
     "message": "Provided by Brave",
@@ -332,7 +300,7 @@
     "description": "An option title on the Preferences screen (option_useSubdomains_title)"
   },
   "option_useSubdomains_description": {
-    "message": "Isolate content roots from each other by loading them as subdomains (at *.localhost) and creating a unique origin for each CID, IPNS, or DNSLink record. Requires go-ipfs 0.5.0 or later on your local node.",
+    "message": "Isolate content roots from each other by loading them as subdomains (at *.localhost) and creating a unique origin for each CID, IPNS, or DNSLink record.",
     "description": "An option description on the Preferences screen (option_useSubdomains_description)"
   },
   "option_dnslinkRedirect_title": {
@@ -388,15 +356,15 @@
     "description": "An option description on the Preferences screen (option_publicSubdomainGatewayUrl_description)"
   },
   "option_header_api": {
-    "message": "API",
+    "message": "Kubo RPC API",
     "description": "A section header on the Preferences screen (option_header_api)"
   },
   "option_ipfsApiUrl_title": {
-    "message": "IPFS API URL",
+    "message": "Kubo RPC URL",
     "description": "An option title on the Preferences screen (option_ipfsApiUrl_title)"
   },
   "option_ipfsApiUrl_description": {
-    "message": "Set the URL of your IPFS API. (Hint: this is where /api/v0/config lives.)",
+    "message": "Set the URL of your Kubo RPC. (Hint: this is where https://docs.ipfs.tech/reference/kubo/rpc/ lives.)",
     "description": "An option description on the Preferences screen (option_ipfsApiUrl_description)"
   },
   "option_ipfsApiPollMs_title": {
@@ -412,8 +380,12 @@
     "description": "An option title on the Preferences screen (option_automaticMode_title)"
   },
   "option_automaticMode_description": {
-    "message": "Automatically switch from your local gateway to your default public gateway if the IPFS API is unavailable.",
+    "message": "Automatically enables automatic redirection to your local gateway when the Kubo RPC endpoint is accessible, and disable it when the endpoint is unavailable.",
     "description": "An option description on the Preferences screen (option_automaticMode_description)"
+  },
+  "option_automaticMode_description_subtext": {
+    "message": "Note: disabling this feature will result in static redirects, independent of the Kubo RPC endpoint's availability, and may produce error when your node is offline.",
+    "description": "An automatic mode option description on the Preferences screen (option_automaticMode_description_subtext)"
   },
   "option_header_dnslink": {
     "message": "DNSLink",
@@ -422,6 +394,10 @@
   "option_header_experiments": {
     "message": "Experiments",
     "description": "A section header on the Preferences screen (option_header_experiments)"
+  },
+  "option_header_redirect_rules": {
+    "message": "Redirect Rules",
+    "description": "A section header on the Preferences screen (option_header_redirect_rules)"
   },
   "option_header_reset": {
     "message": "Reset Preferences",
@@ -515,18 +491,6 @@
     "message": "Load items with x-ipfs-path headers over IPFS (instead of HTTP) if the header value is an IPFS path. To redirect IPNS paths as well, enable DNSLink support.",
     "description": "An option description on the Preferences screen (option_detectIpfsPathHeader_description)"
   },
-  "option_ipfsProxy_title": {
-    "message": "Support for window.ipfs",
-    "description": "An option title for enabling/disabling the IPFS proxy (option_ipfsProxy_title)"
-  },
-  "option_ipfsProxy_description": {
-    "message": "IPFS is added to the window object on every page. Enable/disable access to the functions it exposes.",
-    "description": "An option description for the IPFS proxy (option_ipfsProxy_description)"
-  },
-  "option_ipfsProxy_link_manage_permissions": {
-    "message": "Manage permissions",
-    "description": "Link text for managing permissions"
-  },
   "option_openViaWebUI_title": {
     "message": "Open Imported Files in the Files Screen",
     "description": "An option title on the Preferences screen (option_openViaWebUI_title)"
@@ -542,6 +506,18 @@
   "option_preloadAtPublicGateway_description": {
     "message": "Automatically preload assets imported to IPFS via asynchronous HTTP HEAD requests to a public gateway.",
     "description": "An option description on the Preferences screen (option_preloadAtPublicGateway_description)"
+  },
+  "option_redirect_rules_reset_all": {
+    "message": "Reset All Redirect Rules",
+    "description": "A button label on the Preferences screen (option_redirect_rules_reset_all)"
+  },
+  "option_redirect_rules_row_origin": {
+    "message": "Origin",
+    "description": "A table header on the Preferences screen (option_redirect_rules_row_origin)"
+  },
+  "option_redirect_rules_row_target": {
+    "message": "Target",
+    "description": "A table header on the Preferences screen (option_redirect_rules_row_target)"
   },
   "option_logNamespaces_title": {
     "message": "Log Namespaces",
@@ -622,66 +598,6 @@
   "quickImport_options_openViaWebUI": {
     "message": "Open in Files page",
     "description": "Checkbox label on the share files page (quickImport_options_openViaWebUI)"
-  },
-  "page_proxyAcl_title": {
-    "message": "Manage Permissions",
-    "description": "Page title for the IPFS proxy ACL page (page_proxyAcl_title)"
-  },
-  "page_proxyAcl_subtitle": {
-    "message": "View, change and revoke granted access rights to your IPFS instance.",
-    "description": "Page sub title for the IPFS proxy ACL page (page_proxyAcl_subtitle)"
-  },
-  "page_proxyAcl_no_perms": {
-    "message": "No permissions granted.",
-    "description": "Message displayed when no permissions have been granted (page_proxyAcl_no_perms)"
-  },
-  "page_proxyAcl_confirm_revoke": {
-    "message": "Revoke permission $1 for $2?",
-    "description": "Confirmation message for revoking a permission for a scope (page_proxyAcl_confirm_revoke)"
-  },
-  "page_proxyAcl_confirm_revoke_all": {
-    "message": "Revoke all permissions for $1?",
-    "description": "Confirmation message for revoking all permissions for an scope (page_proxyAcl_confirm_revoke_all)"
-  },
-  "page_proxyAcl_toggle_to_allow_button_title": {
-    "message": "Click to allow",
-    "description": "Button title for toggling permission from deny to allow (page_proxyAcl_toggle_to_allow_button_title)"
-  },
-  "page_proxyAcl_toggle_to_deny_button_title": {
-    "message": "Click to deny",
-    "description": "Button title for toggling permission from allow to deny (page_proxyAcl_toggle_to_deny_button_title)"
-  },
-  "page_proxyAcl_allow_button_value": {
-    "message": "Allow",
-    "description": "Button value for allow (page_proxyAcl_allow_button_value)"
-  },
-  "page_proxyAcl_deny_button_value": {
-    "message": "Deny",
-    "description": "Button value for deny"
-  },
-  "page_proxyAcl_revoke_button_title": {
-    "message": "Revoke $1",
-    "description": "Button title for revoking a permission (page_proxyAcl_revoke_button_title)"
-  },
-  "page_proxyAccessDialog_title": {
-    "message": "Should IPFS Companion allow «$1» to access «$2» at the connected node?",
-    "description": "Main title of the access permission dialog (page_proxyAccessDialog_title)"
-  },
-  "page_proxyAccessDialog_wildcardCheckbox_label": {
-    "message": "Apply this decision to all current and future permissions in this scope",
-    "description": "Label for the apply permissions to all checkbox (page_proxyAccessDialog_wildcardCheckbox_label)"
-  },
-  "page_proxyAcl_revoke_all_button_title": {
-    "message": "Revoke all permissions",
-    "description": "Button title for revoking all permissions (page_proxyAcl_revoke_all_button_title)"
-  },
-  "page_proxyAccessDialog_allowButton_text": {
-    "message": "Allow",
-    "description": "Button text for allowing a permission (page_proxyAccessDialog_allowButton_text)"
-  },
-  "page_proxyAccessDialog_denyButton_text": {
-    "message": "Deny",
-    "description": "Button text for denying a permission (page_proxyAccessDialog_allowButton_text)"
   },
   "page_landingWelcome_title": {
     "message": "Welcome | IPFS Companion",
@@ -798,5 +714,97 @@
   "page_landingWelcome_projects_title": {
     "message": "Related Projects",
     "description": "Projects section title (page_landingWelcome_projects_title)"
+  },
+  "option_header_telemetry": {
+    "message": "Telemetry",
+    "description": "A section header on the Preferences screen (option_header_telemetry)"
+  },
+  "option_telemetry_disclaimer": {
+    "message": "We're collecting minimal telemetry data to improve and prioritize our work. Please consent to the collection of these metrics to assist in our efforts!",
+    "description": "Disclaimer about telemetry collection in the telemetry section on the Preferences screen (option_telemetry_disclaimer)"
+  },
+  "option_telemetryGroupMinimal_title": {
+    "message": "Feature Telemetry",
+    "description": "A title for the 'minimal' grouping of metrics we collect (option_telemetryGroupMinimal_title)"
+  },
+  "option_telemetryGroupMinimal_description": {
+    "message": "Collect basic feature and usage metrics to help maintainers to prioritize work on the most useful features.",
+    "description": "A description for the 'minimal' grouping of metrics we collect (option_telemetryGroupMinimal_description)"
+  },
+  "option_telemetryGroupMarketing_title": {
+    "message": "Marketing title",
+    "description": "A title for the 'marketing' grouping of metrics we collect (option_telemetryGroupMarketing_title)"
+  },
+  "option_telemetryGroupMarketing_description": {
+    "message": "Marketing description",
+    "description": "A description for the 'marketing' grouping of metrics we collect (option_telemetryGroupMarketing_description)"
+  },
+  "option_telemetryGroupPerformance_title": {
+    "message": "Performance title",
+    "description": "A title for the 'performance' grouping of metrics we collect (option_telemetryGroupPerformance_title)"
+  },
+  "option_telemetryGroupPerformance_description": {
+    "message": "Performance description",
+    "description": "A description for the 'performance' grouping of metrics we collect (option_telemetryGroupPerformance_description)"
+  },
+  "option_telemetryGroupTracking_title": {
+    "message": "Tracking title",
+    "description": "A title for the 'tracking' grouping of metrics we collect (option_telemetryGroupTracking_title)"
+  },
+  "option_telemetryGroupTracking_description": {
+    "message": "Tracking description",
+    "description": "A description for the 'tracking' grouping of metrics we collect (option_telemetryGroupTracking_description)"
+  },
+  "recovery_page_title": {
+    "message": "Problem with your IPFS node | IPFS Companion",
+    "description": "Title of the recovery page (recovery_page_title)"
+  },
+  "recovery_page_sub_header": {
+    "message": "Unable to reach your IPFS node :(",
+    "description": "Sub-Header on the recovery screen (recovery_page_sub_header)"
+  },
+  "recovery_page_message_p1": {
+    "message": "Ensure your IPFS node runs and provides HTTP Gateway.",
+    "description": "Message Para-1 on the recovery screen (recovery_page_message_p1)"
+  },
+  "recovery_page_message_p2": {
+    "message": "You can also access deserialized version of the requested resource through the preferred public gateway set up in IPFS Companion. This delegates trust to a third-party address below, and skips local hash validation.",
+    "description": "Message Para-2 on the recovery screen (recovery_page_message_p2)"
+  },
+  "recovery_page_button": {
+    "message": "Continue to the public gateway",
+    "description": "Button on the recovery screen (recovery_page_button)"
+  },
+  "recovery_page_learn_more": {
+    "message": "Learn more about public gateways",
+    "description": "Learn more link on the recovery screen (recovery_page_learn_more)"
+  },
+  "recovery_page_update_preferences": {
+    "message": "Update your IPFS Companion preferences",
+    "description": "Learn more link on the recovery screen (recovery_page_learn_more)"
+  },
+  "request_permissions_page_title": {
+    "message": "Grant Host Permissions | IPFS Companion",
+    "description": "Title of the recovery page (recovery_page_title)"
+  },
+  "request_permissions_page_sub_header": {
+    "message": "Just one more thing to do before you're all set! :)",
+    "description": "Sub-Header on the recovery screen (recovery_page_sub_header)"
+  },
+  "request_permissions_page_message_p1": {
+    "message": "IPFS Companion needs permission to identify IPFS resources on the web.",
+    "description": "Message Para-1 on the recovery screen (recovery_page_message_p1)"
+  },
+  "request_permissions_page_message_p2": {
+    "message": "The IPFS Companion requires Host permission to access data on all websites. This allows it to inspect all web requests, identify ones for content-addressed IPFS resources, and load them using your local IPFS node. Please click the button below to grant these permissions.",
+    "description": "Message Para-2 on the recovery screen (recovery_page_message_p2)"
+  },
+  "request_permissions_page_button": {
+    "message": "Grant Permission",
+    "description": "Button on the recovery screen (recovery_page_button)"
+  },
+  "request_permissions_page_learn_more": {
+    "message": "Learn more about host permissions",
+    "description": "Learn more link on the recovery screen (recovery_page_learn_more)"
   }
 }

@@ -1,15 +1,17 @@
 'use strict'
 /* eslint-env browser, webextensions */
 
-const browser = require('webextension-polyfill')
-const isIPFS = require('is-ipfs')
-const { browserActionFilesCpImportCurrentTab } = require('../../lib/ipfs-import')
-const { ipfsContentPath } = require('../../lib/ipfs-path')
-const { welcomePage, optionsPage } = require('../../lib/constants')
-const { contextMenuViewOnGateway, contextMenuCopyAddressAtPublicGw, contextMenuCopyPermalink, contextMenuCopyRawCid, contextMenuCopyCanonicalAddress, contextMenuCopyCidAddress } = require('../../lib/context-menus')
+import isIPFS from 'is-ipfs'
+import browser from 'webextension-polyfill'
+import { optionsPage, welcomePage } from '../../lib/constants.js'
+import { contextMenuCopyAddressAtPublicGw, contextMenuCopyCanonicalAddress, contextMenuCopyCidAddress, contextMenuCopyPermalink, contextMenuCopyRawCid, contextMenuViewOnGateway } from '../../lib/context-menus.js'
+import { browserActionFilesCpImportCurrentTab } from '../../lib/ipfs-import.js'
+import { ipfsContentPath } from '../../lib/ipfs-path.js'
+import { notifyOptionChange } from '../../lib/redirect-handler/blockOrObserve.js'
+import { POSSIBLE_NODE_TYPES } from '../../lib/state.js'
 
 // The store contains and mutates the state for the app
-module.exports = (state, emitter) => {
+export default (state, emitter) => {
   Object.assign(state, {
     // Global toggles
     active: true,
@@ -25,7 +27,7 @@ module.exports = (state, emitter) => {
     publicSubdomainGatewayUrl: null,
     gatewayAddress: null,
     swarmPeers: null,
-    gatewayVersion: null,
+    kuboRpcBackendVersion: null,
     isApiAvailable: false,
     // isRedirectContext
     currentTab: null,
@@ -38,6 +40,8 @@ module.exports = (state, emitter) => {
   let port
 
   emitter.on('DOMContentLoaded', async () => {
+    browser.runtime.sendMessage({ telemetry: { trackView: 'browser-action' } })
+
     // initial render with status stub
     emitter.emit('render')
     // initialize connection to the background script which will trigger UI updates
@@ -175,6 +179,11 @@ module.exports = (state, emitter) => {
       }
       // console.dir('toggleSiteIntegrations', state)
       await browser.storage.local.set({ disabledOn, enabledOn })
+      await notifyOptionChange()
+      // notifyOptionsChange call is async, sends a message to background and
+      // waits for it to resolve. However, that doesnt work the
+      // same way in Chrome and FF. So we need to wait a bit before reloading.
+      await new Promise(resolve => setTimeout(resolve, 200))
 
       const path = ipfsContentPath(currentTab.url, { keepURIParams: true })
       // Reload the current tab to apply updated redirect preference
@@ -202,14 +211,15 @@ module.exports = (state, emitter) => {
   emitter.on('toggleActive', async () => {
     const prev = state.active
     state.active = !prev
-    if (!state.active) {
-      state.gatewayAddress = state.pubGwURLString
-      state.ipfsApiUrl = null
-      state.gatewayVersion = null
-      state.swarmPeers = null
-      state.isIpfsOnline = false
-    }
     try {
+      if (!state.active) {
+        state.gatewayAddress = state.pubGwURLString
+        state.ipfsApiUrl = null
+        state.kuboRpcBackendVersion = null
+        state.swarmPeers = null
+        state.isIpfsOnline = false
+      }
+      await notifyOptionChange()
       await browser.storage.local.set({ active: state.active })
     } catch (error) {
       console.error(`Unable to update global Active flag due to ${error}`)
@@ -223,28 +233,23 @@ module.exports = (state, emitter) => {
       // Copy all attributes
       Object.assign(state, status)
 
-      if (state.active && status.redirect && (status.ipfsNodeType !== 'embedded')) {
+      if (state.active && status.redirect && POSSIBLE_NODE_TYPES.includes(status.ipfsNodeType)) {
         state.gatewayAddress = status.gwURLString
       } else {
         state.gatewayAddress = status.pubGwURLString
       }
-      // Import requires access to the background page (https://github.com/ipfs-shipyard/ipfs-companion/issues/477)
-      state.isApiAvailable = state.active && !!(await getBackgroundPage()) && !browser.extension.inIncognitoContext // https://github.com/ipfs-shipyard/ipfs-companion/issues/243
+      state.isApiAvailable = state.active && !browser.extension.inIncognitoContext // https://github.com/ipfs-shipyard/ipfs-companion/issues/243
       state.swarmPeers = !state.active || status.peerCount === -1 ? null : status.peerCount
       state.isIpfsOnline = state.active && status.peerCount > -1
-      state.gatewayVersion = state.active && status.gatewayVersion ? status.gatewayVersion : null
+      state.kuboRpcBackendVersion = state.active && status.kuboRpcBackendVersion ? status.kuboRpcBackendVersion : null
       state.ipfsApiUrl = state.active ? status.apiURLString : null
     } else {
       state.ipfsNodeType = 'external'
       state.swarmPeers = null
       state.isIpfsOnline = false
-      state.gatewayVersion = null
+      state.kuboRpcBackendVersion = null
       state.isIpfsContext = false
       state.isRedirectContext = false
     }
   }
-}
-
-function getBackgroundPage () {
-  return browser.runtime.getBackgroundPage()
 }

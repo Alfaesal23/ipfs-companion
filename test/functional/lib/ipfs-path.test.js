@@ -1,13 +1,13 @@
 'use strict'
-const { stub } = require('sinon')
-const { describe, it, beforeEach, afterEach } = require('mocha')
-const { expect } = require('chai')
-const { URL } = require('url')
-const { ipfsUri, ipfsContentPath, createIpfsPathValidator, sameGateway, safeHostname } = require('../../../add-on/src/lib/ipfs-path')
-const { initState } = require('../../../add-on/src/lib/state')
-const createDnslinkResolver = require('../../../add-on/src/lib/dnslink')
-const { optionDefaults } = require('../../../add-on/src/lib/options')
-const { spoofCachedDnslink } = require('./dnslink.test.js')
+import { stub } from 'sinon'
+import { describe, it, beforeEach, afterEach } from 'mocha'
+import { expect } from 'chai'
+import { URL } from 'url'
+import { ipfsUri, ipfsContentPath, createIpfsPathValidator, sameGateway, safeHostname } from '../../../add-on/src/lib/ipfs-path.js'
+import { initState } from '../../../add-on/src/lib/state.js'
+import createDnslinkResolver from '../../../add-on/src/lib/dnslink.js'
+import { optionDefaults } from '../../../add-on/src/lib/options.js'
+import { spoofCachedDnslink } from './dnslink.test.js'
 
 function spoofIpfsResolve (ipfs, path, value) {
   const resolve = stub(ipfs, 'resolve')
@@ -184,8 +184,20 @@ describe('ipfs-path.js', function () {
       const gw = 'http://localhost:8080'
       expect(sameGateway(url, gw)).to.equal(true)
     })
-    it('should return true on 127.0.0.1/0.0.0.0 host match', function () {
+    it('should return true on localhost subdomain host match', function () {
+      const url = 'http://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi.ipfs.localhost:8080/foo/bar'
+      const gw = 'http://localhost:8080'
+      expect(sameGateway(url, gw)).to.equal(true)
+    })
+    it('should return true on RPC webui path 127.0.0.1/0.0.0.0 host match', function () {
+      // this is misconfiguration, but handling it in sameGateway ensures users who do this dont waste our time debugging
       const url = 'http://0.0.0.0:5001/webui'
+      const api = 'http://127.0.0.1:5001'
+      expect(sameGateway(url, api)).to.equal(true)
+    })
+    it('should return true on RPC /api/v0 path 127.0.0.1/0.0.0.0 host match', function () {
+      // this is misconfiguration, but handling it in sameGateway ensures users who do this dont waste our time debugging
+      const url = 'http://0.0.0.0:5001/api/v0/id'
       const api = 'http://127.0.0.1:5001'
       expect(sameGateway(url, api)).to.equal(true)
     })
@@ -198,43 +210,43 @@ describe('ipfs-path.js', function () {
 
   describe('validIpfsOrIpns', function () {
     // this is just a smoke test, extensive tests are in is-ipfs package
-    it('should return true for IPFS NURI', function () {
+    it('should return true for IPFS NURI', async function () {
       const path = '/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest'
-      expect(ipfsPathValidator.validIpfsOrIpns(path)).to.equal(true)
+      expect(await ipfsPathValidator.validIpfsOrIpns(path)).to.equal(true)
     })
-    it('should return false for non-IPFS NURI', function () {
+    it('should return false for non-IPFS NURI', async function () {
       const path = '/ipfs/NotAValidCid'
-      expect(ipfsPathValidator.validIpfsOrIpns(path)).to.equal(false)
+      expect(await ipfsPathValidator.validIpfsOrIpns(path)).to.equal(false)
     })
     // this is just a smoke test, extensive tests are in is-ipfs package
-    it('should return true for URL at IPFS Gateway', function () {
+    it('should return true for URL at IPFS Gateway', async function () {
       const url = 'https://ipfs.io/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest'
-      expect(ipfsPathValidator.validIpfsOrIpns(url)).to.equal(true)
+      expect(await ipfsPathValidator.validIpfsOrIpns(url)).to.equal(true)
     })
-    it('should return false for non-IPFS URL', function () {
+    it('should return false for non-IPFS URL', async function () {
       const url = 'https://ipfs.io/ipfs/NotACid?argTest#hashTest'
-      expect(ipfsPathValidator.validIpfsOrIpns(url)).to.equal(false)
+      expect(await ipfsPathValidator.validIpfsOrIpns(url)).to.equal(false)
     })
   })
 
   describe('publicIpfsOrIpnsResource', function () {
-    it('should return true for URL at Public IPFS Gateway', function () {
+    it('should return true for URL at Public IPFS Gateway', async function () {
       const url = `${state.pubGwURL}ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
-      expect(ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(true)
+      expect(await ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(true)
     })
-    it('should return false for URL at Local IPFS Gateway', function () {
+    it('should return false for URL at Local IPFS Gateway', async function () {
       const url = `${state.gwURL}ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
-      expect(ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
+      expect(await ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
     })
-    it('should return false for IPFS URL at API port', function () {
+    it('should return false for IPFS URL at API port', async function () {
       const url = `${state.apiURL}ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
-      expect(ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
-      expect(ipfsPathValidator.validIpfsOrIpns(url)).to.equal(true)
+      expect(await ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
+      expect(await ipfsPathValidator.validIpfsOrIpns(url)).to.equal(true)
     })
-    it('should return false for non-IPFS URL', function () {
+    it('should return false for non-IPFS URL', async function () {
       const url = 'https://ipfs.io/ipfs/NotACid?argTest#hashTest'
-      expect(ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
-      expect(ipfsPathValidator.validIpfsOrIpns(url)).to.equal(false)
+      expect(await ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
+      expect(await ipfsPathValidator.validIpfsOrIpns(url)).to.equal(false)
     })
     describe('isIpfsPageActionsContext', function () {
       it('should return true for URL at Public IPFS Gateway', function () {
@@ -245,15 +257,15 @@ describe('ipfs-path.js', function () {
         const url = `${state.gwURL}ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
         expect(ipfsPathValidator.isIpfsPageActionsContext(url)).to.equal(true)
       })
-      it('should return false for IPFS URL at API port', function () {
+      it('should return false for IPFS URL at API port', async function () {
         const url = `${state.apiURL}ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
-        expect(ipfsPathValidator.isIpfsPageActionsContext(url)).to.equal(false)
-        expect(ipfsPathValidator.validIpfsOrIpns(url)).to.equal(true)
+        expect(await ipfsPathValidator.isIpfsPageActionsContext(url)).to.equal(false)
+        expect(await ipfsPathValidator.validIpfsOrIpns(url)).to.equal(true)
       })
-      it('should return false for non-IPFS URL', function () {
+      it('should return false for non-IPFS URL', async function () {
         const url = 'https://ipfs.io/ipfs/NotACid?argTest#hashTest'
-        expect(ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
-        expect(ipfsPathValidator.validIpfsOrIpns(url)).to.equal(false)
+        expect(await ipfsPathValidator.publicIpfsOrIpnsResource(url)).to.equal(false)
+        expect(await ipfsPathValidator.validIpfsOrIpns(url)).to.equal(false)
       })
     })
   })
@@ -289,7 +301,7 @@ describe('ipfs-path.js', function () {
       expect(ipfsPathValidator.isRedirectPageActionsContext(url)).to.equal(true)
     })
     it('should return false for /ipfs/ URL at Local Gateway', function () {
-      const url = `${state.gwURL}/ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
+      const url = `${state.gwURL}ipfs/QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR?argTest#hashTest`
       expect(ipfsPathValidator.isRedirectPageActionsContext(url)).to.equal(false)
     })
     it('should return false for IPFS content loaded from IPFS API port', function () {
@@ -316,37 +328,37 @@ describe('ipfs-path.js', function () {
   })
 
   describe('resolveToPublicUrl', function () {
-    it('should resolve URL with CID-in-subdomain to itself', function () {
+    it('should resolve URL with CID-in-subdomain to itself', async function () {
       const url = 'https://bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa.ipfs.dweb.link/wiki/Mars.html?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(url)).to.equal(url)
+      expect(await ipfsPathValidator.resolveToPublicUrl(url)).to.equal(url)
     })
-    it('should resolve URL with /ipfs/ path to the default public gateway', function () {
+    it('should resolve URL with /ipfs/ path to the default public gateway', async function () {
       const url = 'https://example.com/ipfs/bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa/wiki/Mars.html?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(url)).to.equal(`${state.pubGwURL}ipfs/bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa/wiki/Mars.html?argTest#hashTest`)
+      expect(await ipfsPathValidator.resolveToPublicUrl(url)).to.equal(`${state.pubGwURL}ipfs/bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa/wiki/Mars.html?argTest#hashTest`)
     })
-    it('should resolve /ipfs/ path to itself attached to the default public gateway', function () {
+    it('should resolve /ipfs/ path to itself attached to the default public gateway', async function () {
       const path = '/ipfs/bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa/wiki/Mars.html?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(path)).to.equal(`${state.pubGwURL}ipfs/bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa/wiki/Mars.html?argTest#hashTest`)
+      expect(await ipfsPathValidator.resolveToPublicUrl(path)).to.equal(`${state.pubGwURL}ipfs/bafybeicgmdpvw4duutrmdxl4a7gc52sxyuk7nz5gby77afwdteh3jc5bqa/wiki/Mars.html?argTest#hashTest`)
     })
-    it('should resolve URL with /ipns/ path to the default public gateway', function () {
+    it('should resolve URL with /ipns/ path to the default public gateway', async function () {
       const url = 'https://example.com/ipns/docs.ipfs.io/?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(url)).to.equal(`${state.pubGwURL}ipns/docs.ipfs.io/?argTest#hashTest`)
+      expect(await ipfsPathValidator.resolveToPublicUrl(url)).to.equal(`${state.pubGwURL}ipns/docs.ipfs.io/?argTest#hashTest`)
     })
-    it('should resolve /ipns/ path to itself at the default public gateway', function () {
+    it('should resolve /ipns/ path to itself at the default public gateway', async function () {
       const path = '/ipns/docs.ipfs.io/?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(path)).to.equal(`${state.pubGwURL}ipns/docs.ipfs.io/?argTest#hashTest`)
+      expect(await ipfsPathValidator.resolveToPublicUrl(path)).to.equal(`${state.pubGwURL}ipns/docs.ipfs.io/?argTest#hashTest`)
     })
-    it('should resolve non-IPFS URL to itself (DNSLink websites)', function () {
+    it('should resolve non-IPFS URL to itself (DNSLink websites)', async function () {
       const url = 'https://example.com/foo/bar/?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(url)).to.equal(url)
+      expect(await ipfsPathValidator.resolveToPublicUrl(url)).to.equal(url)
     })
-    it('should resolve to null if input is an invalid path', function () {
+    it('should resolve to null if input is an invalid path', async function () {
       const path = '/foo/bar/?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(path)).to.equal(null)
+      expect(await ipfsPathValidator.resolveToPublicUrl(path)).to.equal(null)
     })
-    it('should resolve to null if input is an invalid URL', function () {
+    it('should resolve to null if input is an invalid URL', async function () {
       const url = 'example.com/foo/bar/?argTest#hashTest'
-      expect(ipfsPathValidator.resolveToPublicUrl(url)).to.equal(null)
+      expect(await ipfsPathValidator.resolveToPublicUrl(url)).to.equal(null)
     })
   })
 

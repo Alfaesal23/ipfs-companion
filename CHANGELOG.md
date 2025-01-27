@@ -9,6 +9,68 @@
 
 
 
+## What's Changed
+* fix(release-automation): :wrench: removing default command and skippi github release by @whizzzkid in https://github.com/ipfs/ipfs-companion/pull/1291
+* fix(release-automation): :wrench: Skip Labels by @whizzzkid in https://github.com/ipfs/ipfs-companion/pull/1293
+* chore(readme): update header by @lidel in https://github.com/ipfs/ipfs-companion/pull/1295
+* feat: show full rpc backend version by @lidel in https://github.com/ipfs/ipfs-companion/pull/1294
+* fix(telemetry): :arrow_down: Reduce event syncs by @whizzzkid in https://github.com/ipfs/ipfs-companion/pull/1296
+
+
+**Full Changelog**: https://github.com/ipfs/ipfs-companion/compare/v3.0.1...v3.1.0
+
+## [3.0.1](https://github.com/ipfs/ipfs-companion/compare/v3.0.0...v3.0.1) (2023-09-21)
+
+
+### Bug Fixes
+
+* **firefox:** :wrench: Min FF Version ([#1290](https://github.com/ipfs/ipfs-companion/issues/1290)) ([09492a4](https://github.com/ipfs/ipfs-companion/commit/09492a4ff8b2df69f25ce2fea4f35882a5d9ae2f))
+* **release-automation:** :alien: Tags are not being created. ([#1287](https://github.com/ipfs/ipfs-companion/issues/1287)) ([3229c2a](https://github.com/ipfs/ipfs-companion/commit/3229c2a2be30a3cc440fd47c02474ff8a36eeb16))
+
+## [3.0.0](https://github.com/ipfs/ipfs-companion/compare/v2.22.1...v3.0.0) (2023-09-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **MV3:** Implements the new MV3 standard for browser extensions.
+
+### Features
+
+* **i18n:** :arrow_down: Pulling Translations ([#1286](https://github.com/ipfs/ipfs-companion/issues/1286)) ([33a8f4c](https://github.com/ipfs/ipfs-companion/commit/33a8f4cace4895c79bb978eb3b0302e96ed890cb))
+* **MV3:** MV3 Implementation Collector Branch ([#1182](https://github.com/ipfs/ipfs-companion/issues/1182)) ([5873528](https://github.com/ipfs/ipfs-companion/commit/5873528ebcdeff1ce778e41aedc2db793b6279c6))
+
+
+### Bug Fixes
+
+* **brave:** not updating tab to the new redirect url in some cases. ([#1285](https://github.com/ipfs/ipfs-companion/issues/1285)) ([4097e2d](https://github.com/ipfs/ipfs-companion/commit/4097e2d88d956400d2143adfbc916ac63587488d))
+* build context in docker-compose.e2e.yml ([76a38f3](https://github.com/ipfs/ipfs-companion/commit/76a38f3cff1a4929dd9a24ab4465f8bf6a8e1bb1))
+* **options:** :wastebasket: Fix target URLs. ([#1280](https://github.com/ipfs/ipfs-companion/issues/1280)) ([dcc10f0](https://github.com/ipfs/ipfs-companion/commit/dcc10f0c995fc8cfa97094f491e10a771d6addef))
+
+## [2.22.1](https://github.com/ipfs/ipfs-companion/compare/v2.22.0...v2.22.1) (2023-02-22)
+
+
+### Bug Fixes
+
+* **recovery:** :bug: false-positive for non-gateway URLs ([#1163](https://github.com/ipfs/ipfs-companion/issues/1163)) ([0ee35d2](https://github.com/ipfs/ipfs-companion/commit/0ee35d26f2002ccef84ead30cf6cc2a851ca1c60))
+* **release-automation:** :construction_worker: should no longer be needed ([#1158](https://github.com/ipfs/ipfs-companion/issues/1158)) ([7651e9e](https://github.com/ipfs/ipfs-companion/commit/7651e9e1a3a92b819bf76eb1e7b1c319f247f60f))
+* **release-automation:** :green_heart: stupid hack to add tag in CI ([#1161](https://github.com/ipfs/ipfs-companion/issues/1161)) ([9ea9897](https://github.com/ipfs/ipfs-companion/commit/9ea9897477ae6e6f59a2edefd1c4bf9d881d72a8))
+* replace IPFS API with Kubo RPC ([#1164](https://github.com/ipfs/ipfs-companion/issues/1164)) ([1a6495d](https://github.com/ipfs/ipfs-companion/commit/1a6495de5e1017b533cac4cbf869577f64541770))
+
+## [2.22.0](https://github.com/ipfs/ipfs-companion/compare/ipfs-companion-v2.21.0...ipfs-companion-v2.22.0) (2023-02-15)
+
+
+### Features
+
+* Adding Release Automation ([#1122](https://github.com/ipfs/ipfs-companion/issues/1122)) ([1ed411e](https://github.com/ipfs/ipfs-companion/commit/1ed411e5006a5a477c8002765977f16e1ff755a5))
+* recovery page when local gateway is unreachable ([#1125](https://github.com/ipfs/ipfs-companion/issues/1125)) ([a74fbb3](https://github.com/ipfs/ipfs-companion/commit/a74fbb3736e6f29d337b6046b088f25a2d86e5b0))
+
+
+### Bug Fixes
+
+* :fire: Allow automation to run from manual triggers. ([#1143](https://github.com/ipfs/ipfs-companion/issues/1143)) ([a61e081](https://github.com/ipfs/ipfs-companion/commit/a61e081a75cee6d2a6c66d1c58819e9d63656a51))
+* **release-automation:** :bug: Semver Path ([7036f6d](https://github.com/ipfs/ipfs-companion/commit/7036f6de0c9876e35d1ea0a9b1a5a25e6364d894))
+* **release-automation:** Release Please Using Manifests ([#1149](https://github.com/ipfs/ipfs-companion/issues/1149)) ([f360ff8](https://github.com/ipfs/ipfs-companion/commit/f360ff8f2b132904e74ad551f32eaf07395c048c))
+
 ## [2.6.2](https://github.com/ipfs-shipyard/ipfs-companion/compare/v2.6.1...v2.6.2) (2018-11-22)
 
 
@@ -558,6 +620,3 @@
 
 
 # 0.1.0 (2015-03-22)
-
-
-

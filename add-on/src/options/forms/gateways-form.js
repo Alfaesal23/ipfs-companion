@@ -1,18 +1,19 @@
 'use strict'
 /* eslint-env browser, webextensions */
 
-const browser = require('webextension-polyfill')
-const html = require('choo/html')
-const switchToggle = require('../../pages/components/switch-toggle')
-const { guiURLString, hostTextToArray, hostArrayToText } = require('../../lib/options')
-const { braveNodeType } = require('../../lib/ipfs-client/brave')
+import browser from 'webextension-polyfill'
+import html from 'choo/html/index.js'
+import switchToggle from '../../pages/components/switch-toggle.js'
+import { guiURLString, hostTextToArray, hostArrayToText } from '../../lib/options.js'
+import { braveNodeType } from '../../lib/ipfs-client/brave.js'
+import { POSSIBLE_NODE_TYPES } from '../../lib/state.js'
 
 // Warn about mixed content issues when changing the gateway
 // to something other than HTTP or localhost
 // https://github.com/ipfs-shipyard/ipfs-companion/issues/648
 const secureContextUrl = /^https:\/\/|^http:\/\/localhost|^http:\/\/127.0.0.1|^http:\/\/\[::1\]/
 
-function gatewaysForm ({
+export default function gatewaysForm ({
   ipfsNodeType,
   customGatewayUrl,
   useCustomGateway,
@@ -31,7 +32,7 @@ function gatewaysForm ({
   const onDisabledOnChange = onOptionChange('disabledOn', hostTextToArray)
   const onEnabledOnChange = onOptionChange('enabledOn', hostTextToArray)
   const mixedContentWarning = !secureContextUrl.test(customGatewayUrl)
-  const supportRedirectToCustomGateway = ipfsNodeType !== 'embedded'
+  const supportRedirectToCustomGateway = POSSIBLE_NODE_TYPES.includes(ipfsNodeType)
   const allowChangeOfCustomGateway = ipfsNodeType === 'external'
   const braveClass = ipfsNodeType === braveNodeType ? 'brave' : ''
 
@@ -64,7 +65,7 @@ function gatewaysForm ({
                 <dt>${browser.i18n.getMessage('option_publicSubdomainGatewayUrl_title')}</dt>
                 <dd>
                   ${browser.i18n.getMessage('option_publicSubdomainGatewayUrl_description')}
-                  <p><a class="link underline hover-aqua" href="https://docs.ipfs.io/how-to/address-ipfs-on-web/#subdomain-gateway" target="_blank">
+                  <p><a class="link underline hover-aqua" href="https://docs.ipfs.tech/how-to/address-ipfs-on-web/#subdomain-gateway" target="_blank">
                     ${browser.i18n.getMessage('option_legend_readMore')}
                   </a></p>
                 </dd>
@@ -124,7 +125,7 @@ function gatewaysForm ({
                   <dt>${browser.i18n.getMessage('option_useSubdomains_title')}</dt>
                   <dd>
                     ${browser.i18n.getMessage('option_useSubdomains_description')}
-                    <p><a class="link underline hover-aqua" href="https://docs.ipfs.io/how-to/address-ipfs-on-web/#subdomain-gateway" target="_blank">
+                    <p><a class="link underline hover-aqua" href="https://docs.ipfs.tech/how-to/address-ipfs-on-web/#subdomain-gateway" target="_blank">
                       ${browser.i18n.getMessage('option_legend_readMore')}
                     </a></p>
                   </dd>
@@ -170,5 +171,3 @@ function gatewaysForm ({
     </form>
   `
 }
-
-module.exports = gatewaysForm

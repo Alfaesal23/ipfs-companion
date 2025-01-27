@@ -13,7 +13,7 @@
   },
   "panel_headerActiveToggleTitle": {
     "message": "Basculer toutes les intégrations IPFS",
-    "description": "A label for an embedded IPFS node (panel_headerActiveToggleTitle)"
+    "description": "A label for toggling all IPFS integrations (panel_headerActiveToggleTitle)"
   },
   "panel_statusOffline": {
     "message": "hors ligne",
@@ -28,11 +28,11 @@
     "description": "A label in Node status section of Browser Action pop-up (panel_statusGatewayAddressTitle)"
   },
   "panel_statusApiAddress": {
-    "message": "API",
+    "message": "RPC",
     "description": "A label in Node status section of Browser Action pop-up (panel_statusApiAddress)"
   },
   "panel_statusApiAddressTitle": {
-    "message": "L'URL de l'API de votre nœud local",
+    "message": "L'URL du RPC de votre Kubo local",
     "description": "A label in Node status section of Browser Action pop-up (panel_statusApiAddressTitle)"
   },
   "panel_statusGatewayVersion": {
@@ -92,8 +92,8 @@
     "description": "A menu item tooltip in Browser Action pop-up (panel_importCurrentIpfsAddressTooltip)"
   },
   "panelCopy_currentIpnsAddress": {
-  "message": "Copier le chemin IPNS",
-  "description": "A menu item in Browser Action pop-up and right-click context menu (panelCopy_currentIpnsAddress)"
+    "message": "Copier le chemin IPNS",
+    "description": "A menu item in Browser Action pop-up and right-click context menu (panelCopy_currentIpnsAddress)"
   },
   "panelCopy_currentIpnsAddressTooltip": {
     "message": "Utiliser ce chemin de contenu, les outils IPFS et les passerelles pour obtenir la version la plus récemment mise à jour du contenu de cet onglet.",
@@ -199,24 +199,8 @@
     "message": "Erreur lors de l'importation de la Ressource IPFS",
     "description": "A title of system notification (notify_fileCpImportErrorTitle)"
   },
-  "notify_apiOnlineTitle": {
-    "message": "L'API IPFS est en ligne",
-    "description": "A title of system notification (notify_apiOnlineTitle)"
-  },
-  "notify_apiOnlineAutomaticModeMsg": {
-    "message": "Mode automatique : La redirection vers la passerelle personnalisée est activée",
-    "description": "A message in system notification (notify_apiOnlineAutomaticModeMsg)"
-  },
-  "notify_apiOfflineTitle": {
-    "message": "L'API IPFS est hors ligne",
-    "description": "A title of system notification (notify_apiOfflineTitle)"
-  },
-  "notify_apiOfflineAutomaticModeMsg": {
-    "message": "Mode automatique : la passerelle publique sera utilisée en cas de problème",
-    "description": "A message in system notification (notify_apiOfflineAutomaticModeMsg)"
-  },
   "notify_importErrorTitle": {
-    "message": "Impossible d'importer via l'API IPFS",
+    "message": "Impossible d'importer via le RPC de Kubo",
     "description": "A title of system notification (notify_importErrorTitle)"
   },
   "notify_importTrackingProtectionErrorMsg": {
@@ -239,19 +223,19 @@
     "message": "Impossible de stopper le nœud IPFS",
     "description": "System notification title displayed when stopping an IPFS node fails (notify_stopIpfsNodeErrorTitle)"
   },
-  "option_page_title" : {
+  "option_page_title": {
     "message": "Préférences | IPFS Companion",
     "description": "Title of the Preferences page (option_page_title)"
   },
-  "option_page_header" : {
+  "option_page_header": {
     "message": "Préférences de Companion",
     "description": "Main header on the Preferences screen (option_page_header)"
   },
-  "option_legend_readMore" : {
+  "option_legend_readMore": {
     "message": "En savoir plus",
     "description": "A generic link in option description on the Preferences screen (option_legend_readMore)"
   },
-  "option_header_nodeType" : {
+  "option_header_nodeType": {
     "message": "Nœud IPFS",
     "description": "A section header on the Preferences screen (option_header_nodeType)"
   },
@@ -264,12 +248,8 @@
     "description": "An option title on the Preferences screen (option_ipfsNodeType_title)"
   },
   "option_ipfsNodeType_external_description": {
-    "message": "Choisissez \"Externe\" pour vous connecter à un nœud local grâce à l'API HTTP.",
+    "message": "Set to \"External\" to connect to a local Kubo node using the Kubo RPC API.",
     "description": "An option description on the Preferences screen (option_ipfsNodeType_external_description)"
-  },
-  "option_ipfsNodeType_embedded_description": {
-    "message": "Choisissez \"Embarqué\" pour lancer un nœud js-ipfs directement dans votre navigateur. (Cliquez sur \"En savoir plus\" pour connaître les limitations de cette fonctionnalité expérimentale.)",
-    "description": "An option description on the Preferences screen (option_ipfsNodeType_embedded_description)"
   },
   "option_ipfsNodeType_brave_description": {
     "message": "Reglez sur \"Embarqué dans Brave\" to utiliser le support natif d'IPFS par le navigateur Brave.",
@@ -279,17 +259,9 @@
     "message": "Configuration du nœud IPFS",
     "description": "An option title on the Preferences screen (option_ipfsNodeConfig_title)"
   },
-  "option_ipfsNodeConfig_description": {
-    "message": "Configuration supplémentaire pour le nœud JS IPFS embarqué. Doit être un JSON valide.",
-    "description": "An option description on the Preferences screen (option_ipfsNodeConfig_description)"
-  },
   "option_ipfsNodeType_external": {
     "message": "Externe",
     "description": "An option on the Preferences screen (option_ipfsNodeType_external)"
-  },
-  "option_ipfsNodeType_embedded": {
-    "message": "Intégré",
-    "description": "An option on the Preferences screen (option_ipfsNodeType_embedded)"
   },
   "option_ipfsNodeType_brave": {
     "message": "Embarqué dans Brave",
@@ -332,7 +304,7 @@
     "description": "An option title on the Preferences screen (option_useSubdomains_title)"
   },
   "option_useSubdomains_description": {
-    "message": "Isoler les racines de contenus les unes des autres en les chargeant en tant que sous-domaines (sur *.localhost) et en créant une oriigine unique pour chaque CID, IPNS, ou enregistrement DNSLink. Nécessite un nœud IPFS local go-ipfs 0.5.0 ou plus récent.",
+    "message": "Isole les racines des contenus les unes des autres en les chargeant comme sous-domaines (à *.localhost) et en créant une origine unique pour chaque CID, enregistrement IPNS ou DNSLink.",
     "description": "An option description on the Preferences screen (option_useSubdomains_description)"
   },
   "option_dnslinkRedirect_title": {
@@ -388,15 +360,15 @@
     "description": "An option description on the Preferences screen (option_publicSubdomainGatewayUrl_description)"
   },
   "option_header_api": {
-    "message": "API",
+    "message": "Kubo RPC API",
     "description": "A section header on the Preferences screen (option_header_api)"
   },
   "option_ipfsApiUrl_title": {
-    "message": "Lien de l'API IPFS",
+    "message": "URL du RPC Kubo",
     "description": "An option title on the Preferences screen (option_ipfsApiUrl_title)"
   },
   "option_ipfsApiUrl_description": {
-    "message": "Indiquez l'URL de votre API IPFS. (Astuce: c'est là où /api/v0/config se trouve.)",
+    "message": "Définissez l'URL du RPC de votre Kubo. (Indice: c'est où se trouve https://docs.ipfs.tech/reference/kubo/rpc/ )",
     "description": "An option description on the Preferences screen (option_ipfsApiUrl_description)"
   },
   "option_ipfsApiPollMs_title": {
@@ -412,8 +384,12 @@
     "description": "An option title on the Preferences screen (option_automaticMode_title)"
   },
   "option_automaticMode_description": {
-    "message": "Passer automatiquement de votre passerelle locale vers votre passerelle publique par défaut si l'API IPFS est indisponible.",
+    "message": "Automatically enables automatic redirection to your local gateway when the Kubo RPC endpoint is accessible, and disable it when the endpoint is unavailable.",
     "description": "An option description on the Preferences screen (option_automaticMode_description)"
+  },
+  "option_automaticMode_description_subtext": {
+    "message": "Note: disabling this feature will result in static redirects, independent of the Kubo RPC endpoint's availability, and may produce error when your node is offline.",
+    "description": "An automatic mode option description on the Preferences screen (option_automaticMode_description_subtext)"
   },
   "option_header_dnslink": {
     "message": "DNSLink",
@@ -422,6 +398,10 @@
   "option_header_experiments": {
     "message": "Fonctionnalités expérimentales",
     "description": "A section header on the Preferences screen (option_header_experiments)"
+  },
+  "option_header_redirect_rules": {
+    "message": "Redirect Rules",
+    "description": "A section header on the Preferences screen (option_header_redirect_rules)"
   },
   "option_header_reset": {
     "message": "Réinitialiser les Préférences",
@@ -515,18 +495,6 @@
     "message": "Charger les éléments des headers x-ipfs-path via IPFS (au lieu de HTTP) si la valeur du header est un chemin IPFS. Pour également rediriger les chemins IPNS, activez le support des DNSLink.",
     "description": "An option description on the Preferences screen (option_detectIpfsPathHeader_description)"
   },
-  "option_ipfsProxy_title": {
-    "message": "Support pour window.ipfs",
-    "description": "An option title for enabling/disabling the IPFS proxy (option_ipfsProxy_title)"
-  },
-  "option_ipfsProxy_description": {
-    "message": "IPFS est ajouté à l'objet fenêtre sur toutes les pages. Activer/Désactiver l'accès aux fonctions qu'il expose.",
-    "description": "An option description for the IPFS proxy (option_ipfsProxy_description)"
-  },
-  "option_ipfsProxy_link_manage_permissions": {
-    "message": "Gérer les permissions",
-    "description": "Link text for managing permissions"
-  },
   "option_openViaWebUI_title": {
     "message": "Ouvrir les Fichiers Importés dans l'écran Fichiers",
     "description": "An option title on the Preferences screen (option_openViaWebUI_title)"
@@ -542,6 +510,18 @@
   "option_preloadAtPublicGateway_description": {
     "message": "Précharger automatiquement les éléments importés dans IPFS via une requête HTTP HEAD asynchrone vers une passerelle publique.",
     "description": "An option description on the Preferences screen (option_preloadAtPublicGateway_description)"
+  },
+  "option_redirect_rules_reset_all": {
+    "message": "Reset All Redirect Rules",
+    "description": "A button label on the Preferences screen (option_redirect_rules_reset_all)"
+  },
+  "option_redirect_rules_row_origin": {
+    "message": "Origin",
+    "description": "A table header on the Preferences screen (option_redirect_rules_row_origin)"
+  },
+  "option_redirect_rules_row_target": {
+    "message": "Target",
+    "description": "A table header on the Preferences screen (option_redirect_rules_row_target)"
   },
   "option_logNamespaces_title": {
     "message": "Garder l'historique des espaces de noms",
@@ -588,7 +568,7 @@
     "description": "Header on the share files page (quickImport_subhead_peers)"
   },
   "quickImport_subhead_peers": {
-    "message": "Connecté à $1 noeuds",
+    "message": "Connecté à $1 pairs",
     "description": "Partial info stats beneath the header on the share files page (quickImport_subhead_peers)"
   },
   "quickImport_pick_file_button": {
@@ -623,66 +603,6 @@
     "message": "Ouvrir dans la page Fichiers",
     "description": "Checkbox label on the share files page (quickImport_options_openViaWebUI)"
   },
-  "page_proxyAcl_title": {
-    "message": "Gérer les permissions",
-    "description": "Page title for the IPFS proxy ACL page (page_proxyAcl_title)"
-  },
-  "page_proxyAcl_subtitle": {
-    "message": "Voir, modifier ou révoquer les autorisations d'accès à votre nœud IPFS.",
-    "description": "Page sub title for the IPFS proxy ACL page (page_proxyAcl_subtitle)"
-  },
-  "page_proxyAcl_no_perms": {
-    "message": "Aucune autorisation accordée.",
-    "description": "Message displayed when no permissions have been granted (page_proxyAcl_no_perms)"
-  },
-  "page_proxyAcl_confirm_revoke": {
-    "message": "Révoquer la permission $1 pour $2 ?",
-    "description": "Confirmation message for revoking a permission for a scope (page_proxyAcl_confirm_revoke)"
-  },
-  "page_proxyAcl_confirm_revoke_all": {
-    "message": "Révoquer toutes les permissions pour $1 ?",
-    "description": "Confirmation message for revoking all permissions for an scope (page_proxyAcl_confirm_revoke_all)"
-  },
-  "page_proxyAcl_toggle_to_allow_button_title": {
-    "message": "Cliquez pour autoriser",
-    "description": "Button title for toggling permission from deny to allow (page_proxyAcl_toggle_to_allow_button_title)"
-  },
-  "page_proxyAcl_toggle_to_deny_button_title": {
-    "message": "Cliquez pour refuser",
-    "description": "Button title for toggling permission from allow to deny (page_proxyAcl_toggle_to_deny_button_title)"
-  },
-  "page_proxyAcl_allow_button_value": {
-    "message": "Autoriser",
-    "description": "Button value for allow (page_proxyAcl_allow_button_value)"
-  },
-  "page_proxyAcl_deny_button_value": {
-    "message": "Refuser",
-    "description": "Button value for deny"
-  },
-  "page_proxyAcl_revoke_button_title": {
-    "message": "Révoquer $1",
-    "description": "Button title for revoking a permission (page_proxyAcl_revoke_button_title)"
-  },
-  "page_proxyAccessDialog_title": {
-    "message": "IPFS Companion doit-il autoriser «$1» à accéder à «$2» au nœud connecté?",
-    "description": "Main title of the access permission dialog (page_proxyAccessDialog_title)"
-  },
-  "page_proxyAccessDialog_wildcardCheckbox_label": {
-    "message": "Appliquer ce choix à toutes les permissions courantes et futures de ce périmètre",
-    "description": "Label for the apply permissions to all checkbox (page_proxyAccessDialog_wildcardCheckbox_label)"
-  },
-  "page_proxyAcl_revoke_all_button_title": {
-    "message": "Révoquer toutes les autorisations",
-    "description": "Button title for revoking all permissions (page_proxyAcl_revoke_all_button_title)"
-  },
-  "page_proxyAccessDialog_allowButton_text": {
-    "message": "Autoriser",
-    "description": "Button text for allowing a permission (page_proxyAccessDialog_allowButton_text)"
-  },
-  "page_proxyAccessDialog_denyButton_text": {
-    "message": "Refuser",
-    "description": "Button text for denying a permission (page_proxyAccessDialog_allowButton_text)"
-  },
   "page_landingWelcome_title": {
     "message": "Bienvenue | IPFS Companion",
     "description": "Page title (page_landingWelcome_title)"
@@ -708,7 +628,7 @@
     "description": "Ready message button text for opening Web UI files page (page_landingWelcome_welcome_peersButton_text)"
   },
   "page_landingWelcome_installSteps_notRunning_title": {
-    "message": "IPFS est à l'arrêt",
+    "message": "IPFS est arrêté",
     "description": "Install steps title (page_landingWelcome_installSteps_notRunning_title)"
   },
   "page_landingWelcome_installSteps_brave_title": {
@@ -740,7 +660,7 @@
     "description": "Resources title (page_landingWelcome_resources_title_new_ipfs)"
   },
   "page_landingWelcome_resources_new_ipfs_companion_features": {
-    "message": "En lire plus sur les <0>fonctionnalités d'IPFS Companion</0>",
+    "message": "En apprendre plus sur les <0>fonctionnalités d'IPFS Companion</0>",
     "description": "Resources copy (page_landingWelcome_resources_new_ipfs_companion_features)"
   },
   "page_landingWelcome_resources_new_ipfs_concepts": {
@@ -748,7 +668,7 @@
     "description": "Resources copy (page_landingWelcome_resources_new_ipfs_concepts)"
   },
   "page_landingWelcome_resources_new_ipfs_docs": {
-    "message": "Visiter le <0>site de documentation d'IPFS</0>pour aller plus loin",
+    "message": "Visiter le <0>site de documentation d'IPFS</0> pour aller plus loin",
     "description": "Resources copy (page_landingWelcome_resources_new_ipfs_docs)"
   },
   "page_landingWelcome_resources_title_build": {
@@ -756,11 +676,11 @@
     "description": "Resources title (page_landingWelcome_resources_title_build)"
   },
   "page_landingWelcome_resources_build_tutorials": {
-    "message": "Trouver<0>des recettes et tutoriaux</0>pour vous aider à commencer",
+    "message": "Trouver <0>des recettes et tutoriaux</0> pour vous aider à commencer",
     "description": "Resources copy (page_landingWelcome_resources_build_tutorials)"
   },
   "page_landingWelcome_resources_build_examples": {
-    "message": "Découvrir les <0>projets géniaux</0>qu'on construit d'autres personnes avec IPFS",
+    "message": "Découvrir les <0>projets géniaux</0> qu'ont construit d'autres personnes avec IPFS",
     "description": "Resources copy (page_landingWelcome_resources_build_examples)"
   },
   "page_landingWelcome_resources_title_get_help": {
@@ -776,11 +696,11 @@
     "description": "Community title (page_landingWelcome_resources_title_community)"
   },
   "page_landingWelcome_resources_community_contribute": {
-    "message": "<0>Contribuer</0>au code, la documentation, et autre",
+    "message": "<0>Contribuer</0> au code, la documentation, et plus encore",
     "description": "Community copy (page_landingWelcome_resources_community_contribute)"
   },
   "page_landingWelcome_resources_community_translate": {
-    "message": "<0>Traduire</0>IPFS dans votre langue",
+    "message": "<0>Traduire</0> IPFS dans votre langue",
     "description": "Community copy (page_landingWelcome_resources_community_translate)"
   },
   "page_landingWelcome_resources_community_resources": {
@@ -798,5 +718,97 @@
   "page_landingWelcome_projects_title": {
     "message": "Projets affiliés",
     "description": "Projects section title (page_landingWelcome_projects_title)"
+  },
+  "option_header_telemetry": {
+    "message": "Télémétrie",
+    "description": "A section header on the Preferences screen (option_header_telemetry)"
+  },
+  "option_telemetry_disclaimer": {
+    "message": "Nous collectons une télémétrie minimale pour améliorer et établir des priorités dans notre travail. Merci de consentir à cette collection de mesures pour soutenir nos efforts !",
+    "description": "Disclaimer about telemetry collection in the telemetry section on the Preferences screen (option_telemetry_disclaimer)"
+  },
+  "option_telemetryGroupMinimal_title": {
+    "message": "Télémétrie des fonctionnalités",
+    "description": "A title for the 'minimal' grouping of metrics we collect (option_telemetryGroupMinimal_title)"
+  },
+  "option_telemetryGroupMinimal_description": {
+    "message": "Collecte des mesures de fonctionnalité et d'usage général pour aider les mainteneurs à prioriser leur travail sur les fonctionnalités les plus utiles.",
+    "description": "A description for the 'minimal' grouping of metrics we collect (option_telemetryGroupMinimal_description)"
+  },
+  "option_telemetryGroupMarketing_title": {
+    "message": "TItre marketing",
+    "description": "A title for the 'marketing' grouping of metrics we collect (option_telemetryGroupMarketing_title)"
+  },
+  "option_telemetryGroupMarketing_description": {
+    "message": "Description marketing",
+    "description": "A description for the 'marketing' grouping of metrics we collect (option_telemetryGroupMarketing_description)"
+  },
+  "option_telemetryGroupPerformance_title": {
+    "message": "Titre performance",
+    "description": "A title for the 'performance' grouping of metrics we collect (option_telemetryGroupPerformance_title)"
+  },
+  "option_telemetryGroupPerformance_description": {
+    "message": "Description performance",
+    "description": "A description for the 'performance' grouping of metrics we collect (option_telemetryGroupPerformance_description)"
+  },
+  "option_telemetryGroupTracking_title": {
+    "message": "Titre traçabilité",
+    "description": "A title for the 'tracking' grouping of metrics we collect (option_telemetryGroupTracking_title)"
+  },
+  "option_telemetryGroupTracking_description": {
+    "message": "Description traçabilité",
+    "description": "A description for the 'tracking' grouping of metrics we collect (option_telemetryGroupTracking_description)"
+  },
+  "recovery_page_title": {
+    "message": "Problème avec votre nœud IPFS | IPFS Companion",
+    "description": "Title of the recovery page (recovery_page_title)"
+  },
+  "recovery_page_sub_header": {
+    "message": "Impossible d'atteindre votre nœud IPFS :(",
+    "description": "Sub-Header on the recovery screen (recovery_page_sub_header)"
+  },
+  "recovery_page_message_p1": {
+    "message": "Vérifiez que votre nœud IPFS fournit une passerelle IPFS accessible.",
+    "description": "Message Para-1 on the recovery screen (recovery_page_message_p1)"
+  },
+  "recovery_page_message_p2": {
+    "message": "Vous pouvez aussi accéder à la version désérialisée de la ressource demandée via la passerelle publique favorite définie dans IPFS Companion. Ceci délègue la confiance à l'adresse ci-dessous d'une tierce partie, et évite la validation locale du hash. ",
+    "description": "Message Para-2 on the recovery screen (recovery_page_message_p2)"
+  },
+  "recovery_page_button": {
+    "message": "Continuer vers la passerelle publique",
+    "description": "Button on the recovery screen (recovery_page_button)"
+  },
+  "recovery_page_learn_more": {
+    "message": "En savoir plus sur la passerelle publique",
+    "description": "Learn more link on the recovery screen (recovery_page_learn_more)"
+  },
+  "recovery_page_update_preferences": {
+    "message": "Mettre-à-jour vos préférences d'IPFS Companion",
+    "description": "Learn more link on the recovery screen (recovery_page_learn_more)"
+  },
+  "request_permissions_page_title": {
+    "message": "Grant Host Permissions | IPFS Companion",
+    "description": "Title of the recovery page (recovery_page_title)"
+  },
+  "request_permissions_page_sub_header": {
+    "message": "Just one more thing to do before you're all set! :)",
+    "description": "Sub-Header on the recovery screen (recovery_page_sub_header)"
+  },
+  "request_permissions_page_message_p1": {
+    "message": "IPFS Companion needs permission to identify IPFS resources on the web.",
+    "description": "Message Para-1 on the recovery screen (recovery_page_message_p1)"
+  },
+  "request_permissions_page_message_p2": {
+    "message": "The IPFS Companion requires Host permission to access data on all websites. This allows it to inspect all web requests, identify ones for content-addressed IPFS resources, and load them using your local IPFS node. Please click the button below to grant these permissions.",
+    "description": "Message Para-2 on the recovery screen (recovery_page_message_p2)"
+  },
+  "request_permissions_page_button": {
+    "message": "Grant Permission",
+    "description": "Button on the recovery screen (recovery_page_button)"
+  },
+  "request_permissions_page_learn_more": {
+    "message": "Learn more about host permissions",
+    "description": "Learn more link on the recovery screen (recovery_page_learn_more)"
   }
 }
